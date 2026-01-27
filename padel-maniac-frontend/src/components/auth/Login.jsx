@@ -1,6 +1,7 @@
 import { useState } from "react";
 import './style/Login.css';
 import authService from "../../services/AuthService";
+import {Link} from "react-router-dom";
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -174,7 +175,7 @@ const Login = () => {
 
                         <div className="form-links">
                             <p>
-                                Nemate nalog? <a href="/register">Registrujte se</a>
+                                Nemate nalog? <Link to="/Registration">Registrujte se</Link>
                             </p>
                         </div>
                     </div>
