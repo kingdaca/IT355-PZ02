@@ -16,9 +16,9 @@ public class Role {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private Roles Role;
+    private RoleName name;
 
-    private enum Roles{
+    public enum RoleName{
         PLAYER, COURT_OWNER, ADMIN
     }
 }
