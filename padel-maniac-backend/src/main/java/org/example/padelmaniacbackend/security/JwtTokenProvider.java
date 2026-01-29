@@ -44,10 +44,10 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
-    public String generateToken(String username, String roles) {
+    public String generateToken(String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
-                .claim("roles", roles)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExp))
                 .signWith(SignatureAlgorithm.HS256, jwtSecret)

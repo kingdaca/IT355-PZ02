@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './style/Registration.css';
-import AuthService from "../../services/AuthService";
 import authService from "../../services/AuthService";
+import { useNavigate } from "react-router-dom";
 
 
 const RegistrationForm = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         username: '',
         password: '',
@@ -87,14 +88,7 @@ const RegistrationForm = () => {
             const response = await authService.registration(formData);
 
             if (response.status === 200 || response.status === 201) {
-                setFormData({
-                    username: '',
-                    password: '',
-                    email: '',
-                    firstname: '',
-                    lastName: '',
-                    phone: ''
-                });
+                navigate("/Login");
             }
         } catch (error) {
 
@@ -105,7 +99,7 @@ const RegistrationForm = () => {
                 });
             } else {
                 setErrors({
-                    general: '❌ Došlo je do greške prilikom registracije.'
+
                 });
             }
         } finally {
@@ -114,14 +108,14 @@ const RegistrationForm = () => {
     };
 
     return (
-        <div className="registration-container">
+        <div className="container">
             <div className="form-wrapper">
                 <div className="form-header">
-                    <h2>👤 Kreiraj Novi Nalog</h2>
-                    <p>Pridružite se našoj zajednici</p>
+                    <h2>👤 Crate new account</h2>
+                    <p>Join in our community</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="registration-form">
+                <form onSubmit={handleSubmit} className="forms">
                     {errors.general && (
                         <div className="error-message general-error">
                             {errors.general}

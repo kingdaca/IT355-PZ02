@@ -12,6 +12,10 @@ import java.util.List;
 
 
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 @Table(name = "matches")
 public class Match {
     @Id
@@ -26,8 +30,15 @@ public class Match {
     )
     private List<Player> players;
 
+    private int freePosition;
+    @ManyToOne
+    @JoinColumn(name = "city_id")
+    private City location;
+
     private LocalDate matchDay;
     private LocalTime matchTime;
+
+    private String notes;
 
     @OneToOne
     @JoinColumn(name = "court_id")

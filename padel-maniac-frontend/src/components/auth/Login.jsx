@@ -1,9 +1,12 @@
 import { useState } from "react";
-import './style/Login.css';
+import './style/Registration.css';
 import authService from "../../services/AuthService";
 import {Link} from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         username: '',
         password: ''
@@ -31,11 +34,11 @@ const Login = () => {
         const newErrors = {};
 
         if (!formData.username.trim()) {
-            newErrors.username = 'Korisničko ime je obavezno';
+            newErrors.username = 'Please enter username';
         }
 
         if (!formData.password) {
-            newErrors.password = 'Lozinka je obavezna';
+            newErrors.password = 'Please enter password';
         }
 
         return newErrors;
@@ -56,47 +59,48 @@ const Login = () => {
 
         try {
             const resp = await authService.login(formData.username, formData.password);
+            localStorage.setItem("token", resp.data.token);
+            var decode = jwtDecode(resp.data.token)
+            localStorage.setItem("role",decode.role);
+            console.log(localStorage.getItem("role"))
 
             setTimeout(() => {
-                setSuccessMessage('🎉 Uspešno ste prijavljeni!');
                 setIsSubmitting(false);
+                navigate("/HomePage")
             }, 1500);
 
         } catch (error) {
-            console.error('Greška pri prijavi:', error);
 
             if (error.response) {
                 if (error.response.status === 401) {
                     setErrors({
-                        general: '❌ Pogrešno korisničko ime ili lozinka.'
+                        general: '❌ ' + error.response.data
                     });
                 } else if (error.response.status === 404) {
                     setErrors({
-                        general: '👤 Korisnik nije pronađen.'
+                        general: '👤 ' + error.response.data
                     });
                 } else {
                     setErrors({
-                        general: '❌ Došlo je do greške pri prijavi.'
+                        general: '❌ Server error'
                     });
                 }
             } else {
-                setErrors({
-                    general: '🌐 Problem sa mrežom. Pokušajte ponovo.'
-                });
+
             }
             setIsSubmitting(false);
         }
     };
 
     return (
-        <div className="login-container">
+        <div className="container">
             <div className="form-wrapper">
                 <div className="form-header">
-                    <h2>🔐 Dobrodošli Nazad</h2>
-                    <p>Prijavite se i pronađite novi meč</p>
+                    <h2>🔐 Welcome back</h2>
+                    <p>Find new match</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="login-form">
+                <form onSubmit={handleSubmit} className="forms">
                     {errors.general && (
                         <div className="error-message general-error">
                             {errors.general}
@@ -121,7 +125,7 @@ const Login = () => {
                             value={formData.username}
                             onChange={handleChange}
                             className={errors.username ? 'error' : ''}
-                            placeholder="Unesite korisničko ime"
+                            placeholder="Username"
                         />
                         {errors.username && <span className="error-text">{errors.username}</span>}
                     </div>
@@ -138,7 +142,7 @@ const Login = () => {
                             value={formData.password}
                             onChange={handleChange}
                             className={errors.password ? 'error' : ''}
-                            placeholder="Unesite lozinku"
+                            placeholder="Password"
                         />
                         {errors.password && <span className="error-text">{errors.password}</span>}
                     </div>
@@ -146,11 +150,8 @@ const Login = () => {
                     <div className="form-options">
                         <label className="remember-me">
                             <input type="checkbox" />
-                            <span>Zapamti me</span>
+                            <span>Save password</span>
                         </label>
-                        <a href="/forgot-password" className="forgot-password">
-                            Zaboravili ste lozinku?
-                        </a>
                     </div>
 
                     <div className="form-footer">
@@ -162,20 +163,16 @@ const Login = () => {
                             {isSubmitting ? (
                                 <>
                                     <span className="spinner"></span>
-                                    Prijavljujem...
+                                    Logging...
                                 </>
                             ) : (
-                                '🔑 Prijavi se'
+                                '🔑 Login'
                             )}
                         </button>
 
-                        <div className="divider">
-                            <span>ili</span>
-                        </div>
-
                         <div className="form-links">
                             <p>
-                                Nemate nalog? <Link to="/Registration">Registrujte se</Link>
+                                Do you have account? <Link to="/Registration">Register</Link>
                             </p>
                         </div>
                     </div>
