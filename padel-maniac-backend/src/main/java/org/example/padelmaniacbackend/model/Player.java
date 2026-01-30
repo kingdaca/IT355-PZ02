@@ -1,12 +1,14 @@
 package org.example.padelmaniacbackend.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -36,6 +38,9 @@ public class Player {
 
     @ManyToMany(mappedBy = "players")
     private List<Match> matches;
+
+    @OneToMany(mappedBy = "matchOrganizer", cascade = CascadeType.ALL)
+    private List<Match> organizedMatches = new ArrayList<>();
 
     public enum Level{
         BEGINNER, INTERMEDIATE, ADVANCED

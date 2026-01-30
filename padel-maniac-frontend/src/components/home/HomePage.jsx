@@ -21,7 +21,7 @@ const HomePage = () => {
                     </p>
                     <div className="hero-buttons">
                         {role ? (
-                            <a href="/FindMatch" className="btn-primary">Find match</a>
+                            <a href="/Matches" className="btn-primary">Find match</a>
                             ) : (
                             <a href="/Login" className="btn-primary">Start Your Journey</a>
                             )}

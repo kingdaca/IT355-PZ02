@@ -36,7 +36,13 @@ public class Match {
     private City location;
 
     private LocalDate matchDay;
-    private LocalTime matchTime;
+    private LocalTime matchAroundTime;
+    private LocalTime matchConfirmedTime;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organizer_id", nullable = false)
+    private Player matchOrganizer;
 
     private String notes;
 

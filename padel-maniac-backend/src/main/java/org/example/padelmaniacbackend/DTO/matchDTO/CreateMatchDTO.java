@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -15,8 +16,8 @@ public class CreateMatchDTO {
 
     private int numberOfPlayers;
     private LocalDate date;
+    private LocalTime matchAroundTime;
     private String city;
     private String notes;
-    private String username;
 
 }

@@ -5,6 +5,7 @@ import Registration from "./components/auth/Registration";
 import HomePage from "./components/home/HomePage";
 import CreateMatch from "./components/Match/CreatMatchComponent";
 import {Route, Routes} from "react-router-dom";
+import Matches from "./components/Match/Matches";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/registration" element={<Registration />} />
           <Route path="/HomePage" element={<HomePage />} />
           <Route path="/CreateMatch" element={<CreateMatch />} />
+          <Route path="/Matches" element={<Matches />} />
       </Routes>
     </div>
   );

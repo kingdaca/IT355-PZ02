@@ -1,13 +1,15 @@
 import React, {useEffect, useState} from "react";
-import "./CreatMatch.css"
+import "./style/CreatMatch.css"
 import CitiesService from "../../services/CitiesService";
 import MatchService from "../../services/MatchService";
+import {useNavigate} from "react-router-dom";
+import matchers from "@testing-library/jest-dom/matchers";
 
 const CreateMatch = () => {
     const [cities, setCities] = useState([]);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const navigate = useNavigate();
     useEffect(() => {
         CitiesService.getAllCities()
             .then(response => {
@@ -23,6 +25,7 @@ const CreateMatch = () => {
         city: '',
         numberOfPlayers: '',
         date: '',
+        matchAroundTime: '',
         notes: '',
     });
 
@@ -77,6 +80,8 @@ const CreateMatch = () => {
             return;
         }
 
+        formData.matchAroundTime = formData.date.slice(-5);
+
         setIsSubmitting(true);
         setErrors({}); // Clear previous errors
 
@@ -93,10 +98,12 @@ const CreateMatch = () => {
                 numberOfPlayers: '',
                 date: '',
                 notes: '',
+                aroundTime: ''
             });
 
-            // Optional: Close modal or redirect after success
-            // setTimeout(() => onClose(), 2000);
+            setTimeout(()=>{
+                navigate("/HomePage")
+            })
 
         } catch (error) {
             console.error("Error creating match:", error);
@@ -129,6 +136,7 @@ const CreateMatch = () => {
             }
         } finally {
             setIsSubmitting(false);
+
         }
     };
 
@@ -187,7 +195,7 @@ const CreateMatch = () => {
                                 name="date"
                                 onChange={handleChange}
                                 value={formData.date}
-                                type="date"
+                                type="datetime-local"
                                 className={`form-control ${errors.date ? 'error' : ''}`}
                                 onKeyPress={handleKeyPress}
                             />
@@ -195,6 +203,7 @@ const CreateMatch = () => {
                                 <span className="error-text">{errors.date}</span>
                             )}
                         </div>
+
 
                         <div className="form-group">
                             <label>Location *</label>
