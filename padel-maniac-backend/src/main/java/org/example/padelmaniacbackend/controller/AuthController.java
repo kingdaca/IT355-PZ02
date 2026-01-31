@@ -36,7 +36,8 @@ public class AuthController {
             boolean matches = passwordEncoder.matches(loginDTO.getPassword(), player.getPassword());
             if(matches){
                 String role = String.valueOf(player.getRole().getName());
-                String token = jwtTokenProvider.generateToken(player.getUsername(),role);
+                Long userId = player.getId();
+                String token = jwtTokenProvider.generateToken(player.getUsername(),role, userId);
                 return ResponseEntity.ok(new LoginReponseDTO(token));
             }else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

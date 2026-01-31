@@ -6,6 +6,7 @@ import HomePage from "./components/home/HomePage";
 import CreateMatch from "./components/Match/CreatMatchComponent";
 import {Route, Routes} from "react-router-dom";
 import Matches from "./components/Match/Matches";
+import MatchDetails from "./components/MatchDetails/MatchDetails";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/HomePage" element={<HomePage />} />
           <Route path="/CreateMatch" element={<CreateMatch />} />
           <Route path="/Matches" element={<Matches />} />
+        <Route path="/match/:matchId" element={<MatchDetails />} />
       </Routes>
     </div>
   );

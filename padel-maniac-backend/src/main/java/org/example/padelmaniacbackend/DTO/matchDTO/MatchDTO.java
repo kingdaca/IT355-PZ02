@@ -10,6 +10,7 @@ import org.example.padelmaniacbackend.DTO.Court.CourtDTO;
 import org.example.padelmaniacbackend.DTO.playerDTO.PlayerDTO;
 import org.example.padelmaniacbackend.model.City;
 import org.example.padelmaniacbackend.model.Court;
+import org.example.padelmaniacbackend.model.Match;
 import org.example.padelmaniacbackend.model.Player;
 
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ public class MatchDTO {
     private String location;
     List<PlayerDTO> players;
     private LocalDate matchDay;
+    private Match.MatchStatus matchStatus;
     private LocalTime matchAroundTime;
     private LocalTime matchConfirmedTime;
     private PlayerDTO matchOrganizer;

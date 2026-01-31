@@ -43,4 +43,25 @@ public class MatchController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
         }
     }
+
+    @PostMapping("/joinToMatch")
+    public ResponseEntity<?> joinToMatch(@RequestBody Long matchId){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName(); // 👈 USERNAME
+
+        try{
+            return ResponseEntity.ok(matchService.joinToMatch(matchId, username));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
+        }
+    }
+
+    @PostMapping("/matchDetails")
+    public ResponseEntity<?> matchDetails(@RequestBody Long matchId){
+        try{
+            return ResponseEntity.ok(matchService.matchDetails(matchId));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
+        }
+    }
 }

@@ -62,6 +62,7 @@ const Login = () => {
             localStorage.setItem("token", resp.data.token);
             var decode = jwtDecode(resp.data.token)
             localStorage.setItem("role",decode.role);
+            localStorage.setItem("userId", decode.userId);
             console.log(localStorage.getItem("role"))
 
             setTimeout(() => {

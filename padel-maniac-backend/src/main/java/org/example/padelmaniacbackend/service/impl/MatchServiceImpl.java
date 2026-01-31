@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,14 +46,39 @@ public class MatchServiceImpl implements MatchService {
         m.setFreePosition(createMatchDTO.getNumberOfPlayers());
         m.setMatchAroundTime(createMatchDTO.getMatchAroundTime());
         m.setPlayers(players);
+        m.setMatchStatus(Match.MatchStatus.OPEN);
         m.setMatchOrganizer(p);
         matchRepository.save(m);
     }
+
 
     @Override
     public List<MatchDTO> getMatches(){
         return findAllMatches();
     }
+
+    @Override
+    public MatchDTO joinToMatch(Long matchId, String username) {
+        Player p = playerRepository.findByUsername(username);
+        Match m = matchRepository.findById(matchId);
+
+        m.getPlayers().add(p);
+
+        m.setFreePosition(m.getFreePosition() -1);
+
+        if(m.getFreePosition() == 0){
+            m.setMatchStatus(Match.MatchStatus.FULL);
+        }
+
+        matchRepository.save(m);
+
+        return convertToDTO(m);
+    }
+
+    public MatchDTO matchDetails(Long matchId){
+        return convertToDTO(matchRepository.findById(matchId));
+    }
+
 
     public List<MatchDTO> findAllMatches() {
         return matchRepository.findAll().stream()
@@ -74,7 +100,7 @@ public class MatchServiceImpl implements MatchService {
                 .map(player -> {
                     PlayerDTO playerDTO = new PlayerDTO();
                     playerDTO.setId(player.getId());
-                    playerDTO.setPhone(playerDTO.getPhone());
+                    playerDTO.setPhone(player.getPhone());
                     playerDTO.setUsername(player.getUsername());
                     playerDTO.setFirstName(player.getFirstName());
                     playerDTO.setLastName(player.getLastName());
@@ -97,6 +123,8 @@ public class MatchServiceImpl implements MatchService {
         dto.setMatchOrganizer(organizerDTO);
 
         dto.setLocation(match.getLocation().getName());
+
+        dto.setMatchStatus(match.getMatchStatus());
 
         if (match.getCourt() != null) {
             CourtDTO courtDTO = new CourtDTO();

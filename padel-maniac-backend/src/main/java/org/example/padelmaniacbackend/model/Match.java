@@ -39,6 +39,9 @@ public class Match {
     private LocalTime matchAroundTime;
     private LocalTime matchConfirmedTime;
 
+    @Enumerated(EnumType.STRING)
+    private MatchStatus matchStatus;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id", nullable = false)
@@ -49,6 +52,10 @@ public class Match {
     @OneToOne
     @JoinColumn(name = "court_id")
     private Court court;
+
+    public enum MatchStatus {
+        OPEN, CANCELED, FULL, ONGOING , ENDED
+    }
 }
 
 
