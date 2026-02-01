@@ -1,8 +1,8 @@
 package org.example.padelmaniacbackend.controller;
 
-import org.example.padelmaniacbackend.DTO.auth.LoginDTO;
-import org.example.padelmaniacbackend.DTO.auth.LoginReponseDTO;
-import org.example.padelmaniacbackend.DTO.registration.RegistrationDTO;
+import org.example.padelmaniacbackend.DTOs.auth.LoginDTO;
+import org.example.padelmaniacbackend.DTOs.auth.LoginReponseDTO;
+import org.example.padelmaniacbackend.DTOs.registration.RegistrationDTO;
 import org.example.padelmaniacbackend.model.Player;
 import org.example.padelmaniacbackend.repository.PlayerRepository;
 import org.example.padelmaniacbackend.security.JwtTokenProvider;

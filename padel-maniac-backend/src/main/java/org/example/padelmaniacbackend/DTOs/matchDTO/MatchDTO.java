@@ -1,17 +1,12 @@
-package org.example.padelmaniacbackend.DTO.matchDTO;
+package org.example.padelmaniacbackend.DTOs.matchDTO;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.example.padelmaniacbackend.DTO.City.CityDTO;
-import org.example.padelmaniacbackend.DTO.Court.CourtDTO;
-import org.example.padelmaniacbackend.DTO.playerDTO.PlayerDTO;
-import org.example.padelmaniacbackend.model.City;
-import org.example.padelmaniacbackend.model.Court;
+import org.example.padelmaniacbackend.DTOs.Court.CourtDTO;
+import org.example.padelmaniacbackend.DTOs.playerDTO.PlayerDTO;
 import org.example.padelmaniacbackend.model.Match;
-import org.example.padelmaniacbackend.model.Player;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

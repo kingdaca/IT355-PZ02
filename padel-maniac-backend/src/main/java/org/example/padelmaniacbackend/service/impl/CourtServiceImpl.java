@@ -1,7 +1,6 @@
 package org.example.padelmaniacbackend.service.impl;
 
-import org.example.padelmaniacbackend.DTO.Court.CourtDTO;
-import org.example.padelmaniacbackend.DTO.matchDTO.MatchDTO;
+import org.example.padelmaniacbackend.DTOs.Court.CourtDTO;
 import org.example.padelmaniacbackend.model.Court;
 import org.example.padelmaniacbackend.repository.CourtRepository;
 import org.example.padelmaniacbackend.service.CourtService;
@@ -26,8 +25,8 @@ public class CourtServiceImpl implements CourtService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-
-    private CourtDTO convertToDTO(Court court){
+    @Override
+    public CourtDTO convertToDTO(Court court){
         CourtDTO courtDTO = new CourtDTO();
         courtDTO.setAddress(court.getAddress());
         courtDTO.setId(court.getId());

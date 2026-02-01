@@ -1,4 +1,4 @@
-package org.example.padelmaniacbackend.DTO.auth;
+package org.example.padelmaniacbackend.DTOs.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +9,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class LoginDTO {
+public class LoginReponseDTO {
 
-    private String username;
-    private String password;
-
+    private String token;
 }

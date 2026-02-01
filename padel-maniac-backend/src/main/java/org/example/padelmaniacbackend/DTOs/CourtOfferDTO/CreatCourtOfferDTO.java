@@ -1,4 +1,4 @@
-package org.example.padelmaniacbackend.DTO.CourtOfferDTO;
+package org.example.padelmaniacbackend.DTOs.CourtOfferDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

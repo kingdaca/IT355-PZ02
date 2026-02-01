@@ -1,12 +1,10 @@
 package org.example.padelmaniacbackend.controller;
 
-import org.example.padelmaniacbackend.DTO.CourtOfferDTO.CreatCourtOfferDTO;
+import org.example.padelmaniacbackend.DTOs.CourtOfferDTO.CreatCourtOfferDTO;
 import org.example.padelmaniacbackend.service.CourtOfferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +25,14 @@ public class CourtOfferController {
         }catch (Exception exception){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
         }
+    };
 
+    @PostMapping("/getOffersByMatchId")
+    public ResponseEntity<?> getOffersByMatchId(@RequestBody Long matchId){
+        try {
+            return ResponseEntity.ok(courtOfferService.findByMatchId(matchId));
+        }catch (Exception exception){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
+        }
     };
 }

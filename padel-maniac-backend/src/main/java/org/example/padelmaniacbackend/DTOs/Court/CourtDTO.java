@@ -1,4 +1,4 @@
-package org.example.padelmaniacbackend.DTO.Court;
+package org.example.padelmaniacbackend.DTOs.Court;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +12,6 @@ import lombok.ToString;
 public class CourtDTO {
 
     private Long id;
-
     private String city;
     private String courtName;
     private String Address;

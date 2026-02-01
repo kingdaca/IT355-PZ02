@@ -1,9 +1,7 @@
 package org.example.padelmaniacbackend.service;
 
-import org.example.padelmaniacbackend.DTO.matchDTO.CreateMatchDTO;
-import org.example.padelmaniacbackend.DTO.matchDTO.MatchDTO;
-import org.example.padelmaniacbackend.DTO.playerDTO.PlayerDTO;
-import org.example.padelmaniacbackend.model.Match;
+import org.example.padelmaniacbackend.DTOs.matchDTO.CreateMatchDTO;
+import org.example.padelmaniacbackend.DTOs.matchDTO.MatchDTO;
 
 import java.util.List;
 

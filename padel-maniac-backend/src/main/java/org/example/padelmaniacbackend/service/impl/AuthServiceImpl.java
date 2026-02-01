@@ -1,6 +1,6 @@
 package org.example.padelmaniacbackend.service.impl;
 
-import org.example.padelmaniacbackend.DTO.registration.RegistrationDTO;
+import org.example.padelmaniacbackend.DTOs.registration.RegistrationDTO;
 import org.example.padelmaniacbackend.model.Player;
 import org.example.padelmaniacbackend.model.Role;
 import org.example.padelmaniacbackend.repository.PlayerRepository;

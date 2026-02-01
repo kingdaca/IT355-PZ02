@@ -1098,3 +1098,582 @@
         padding: 15px;
     }
 }
+
+/* ============================================
+   DODATAK ZA PONUDE U MATCH DETAILS
+   ============================================ */
+
+/* Match Tabs */
+.match-tabs {
+    display: flex;
+    gap: 10px;
+    margin: 25px 0;
+    background: white;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 5px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn {
+    padding: 12px 25px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 16px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab-btn:hover {
+    color: #336699;
+}
+
+.tab-btn.active {
+    color: #336699;
+    border-bottom-color: #336699;
+    background-color: #f8f9ff;
+}
+
+/* Offers Section */
+.offers-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    margin-top: 20px;
+}
+
+.offers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.offers-header h2 {
+    color: #336699;
+    margin: 0;
+}
+
+.offers-count {
+    background: #c6ed2c;
+    color: #336699;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* No Offers State */
+.no-offers {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.no-offers-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.no-offers h3 {
+    color: #336699;
+    margin-bottom: 10px;
+}
+
+.no-offers p {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.hint {
+    font-size: 0.9rem;
+    color: #888;
+    font-style: italic;
+}
+
+/* Offers List */
+.offers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.offer-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 25px;
+    transition: all 0.3s ease;
+}
+
+.offer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: #c6ed2c;
+}
+
+/* Status based borders */
+.offer-card.status-pending {
+    border-left: 5px solid #ffc107;
+}
+
+.offer-card.status-accepted {
+    border-left: 5px solid #28a745;
+}
+
+.offer-card.status-rejected {
+    border-left: 5px solid #dc3545;
+    opacity: 0.7;
+}
+
+.offer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.offer-court h3 {
+    color: #336699;
+    margin: 0 0 5px 0;
+    font-size: 1.3rem;
+}
+
+.court-city {
+    background: #e9ecef;
+    color: #495057;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+.offer-status .status-badge {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.status-accepted {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.offer-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #336699;
+    min-width: 100px;
+}
+
+.detail-value {
+    color: #333;
+    flex: 1;
+}
+
+.detail-value.price {
+    color: #28a745;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.detail-value.notes {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 3px solid #336699;
+    font-style: italic;
+}
+
+.offer-actions {
+    display: flex;
+    gap: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.btn-accept, .btn-reject {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.btn-accept {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    color: white;
+}
+
+.btn-accept:hover {
+    background: linear-gradient(135deg, #218838 0%, #155724 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-reject {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-reject:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.accepted-badge, .rejected-badge {
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    text-align: center;
+    width: 100%;
+}
+
+.accepted-badge {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.rejected-badge {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Accept Offer Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.accept-modal {
+    background: white;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    color: white;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    opacity: 0.8;
+}
+
+.modal-content {
+    padding: 30px;
+}
+
+.modal-content p {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.offer-summary {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #e9ecef;
+}
+
+.offer-summary h4 {
+    color: #336699;
+    margin-bottom: 15px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.summary-item span {
+    color: #666;
+}
+
+.summary-item .price {
+    color: #28a745;
+    font-size: 1.2rem;
+}
+
+.warning-note {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.modal-footer {
+    padding: 20px 30px;
+    background: #f8f9fa;
+    display: flex;
+    gap: 15px;
+}
+
+.btn-cancel, .btn-confirm {
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    flex: 1;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
+}
+
+.btn-confirm {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    color: white;
+}
+
+.btn-confirm:hover {
+    background: linear-gradient(135deg, #218838 0%, #155724 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+/* Match status colors */
+.match-status.status-open {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.match-status.status-full {
+    background: #ffebee;
+    color: #c62828;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.match-status.status-ongoing {
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.match-status.status-canceled {
+    background: #f5f5f5;
+    color: #757575;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.match-status.status-ended {
+    background: #f3e5f5;
+    color: #7b1fa2;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* ============================================
+   RESPONSIVE ZA PONUDE
+   ============================================ */
+
+@media (max-width: 768px) {
+    /* Tabs responsive */
+    .match-tabs {
+        flex-direction: column;
+    }
+
+    .tab-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Offers responsive */
+    .offers-section {
+        padding: 20px 15px;
+    }
+
+    .offers-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .offer-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .detail-label {
+        min-width: auto;
+    }
+
+    .offer-actions {
+        flex-direction: column;
+    }
+
+    .btn-accept, .btn-reject {
+        width: 100%;
+    }
+
+    /* Modal responsive */
+    .accept-modal {
+        margin: 10px;
+    }
+
+    .modal-header {
+        padding: 20px 15px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .modal-content {
+        padding: 15px;
+    }
+
+    .summary-item {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .modal-footer {
+        padding: 15px;
+        flex-direction: column;
+    }
+
+    .btn-cancel, .btn-confirm {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .offer-card {
+        padding: 15px;
+    }
+
+    .offer-court h3 {
+        font-size: 1.1rem;
+    }
+
+    .court-city {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 3px 10px;
+    }
+
+    .detail-label {
+        font-size: 0.85rem;
+    }
+
+    .detail-value {
+        font-size: 0.9rem;
+    }
+
+    .detail-value.price {
+        font-size: 1rem;
+    }
+}

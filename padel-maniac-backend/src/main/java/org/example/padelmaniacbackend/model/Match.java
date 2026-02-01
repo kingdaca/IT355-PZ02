@@ -1,10 +1,8 @@
 package org.example.padelmaniacbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,10 +11,10 @@ import java.util.List;
 
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Table(name = "matches")
 public class Match {
     @Id
@@ -29,11 +27,13 @@ public class Match {
             joinColumns = @JoinColumn(name = "match_id"),
             inverseJoinColumns = @JoinColumn(name = "player_id")
     )
+    @JsonIgnore
     private List<Player> players;
 
     private int freePosition;
     @ManyToOne
     @JoinColumn(name = "city_id")
+    @JsonIgnore
     private City location;
 
     private LocalDate matchDay;
@@ -49,15 +49,18 @@ public class Match {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id", nullable = false)
+    @JsonIgnore
     private Player matchOrganizer;
 
     private String notes;
 
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<CourtOffer> courtOffers = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "court_id")
+    @JsonIgnore
     private Court court;
 
     public enum MatchStatus {

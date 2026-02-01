@@ -1,4 +1,4 @@
-package org.example.padelmaniacbackend.DTO.matchDTO;
+package org.example.padelmaniacbackend.DTOs.matchDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

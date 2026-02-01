@@ -1,4 +1,4 @@
-package org.example.padelmaniacbackend.DTO.auth;
+package org.example.padelmaniacbackend.DTOs.City;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class LoginReponseDTO {
+public class CityDTO {
 
-    private String token;
+    private Long id;
+    private String name;
 }

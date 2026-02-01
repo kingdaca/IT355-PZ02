@@ -2,17 +2,16 @@ package org.example.padelmaniacbackend.model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -31,19 +30,23 @@ public class Player {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
+    @JsonIgnore
     private Role role;
 
     @Enumerated(EnumType.STRING)
     private Level level;
 
     @ManyToMany(mappedBy = "players")
+    @JsonIgnore
     private List<Match> matches;
 
     @OneToMany(mappedBy = "matchOrganizer", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Match> organizedMatches = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "court_id")
+    @JsonIgnore
     private Court court;
 
     public enum Level{

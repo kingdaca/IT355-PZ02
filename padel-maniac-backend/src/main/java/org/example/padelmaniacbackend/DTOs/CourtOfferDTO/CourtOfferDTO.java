@@ -1,17 +1,18 @@
-package org.example.padelmaniacbackend.DTO.CourtOfferDTO;
+package org.example.padelmaniacbackend.DTOs.CourtOfferDTO;
 
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.example.padelmaniacbackend.DTOs.Court.CourtDTO;
+import org.example.padelmaniacbackend.DTOs.matchDTO.MatchDTO;
 import org.example.padelmaniacbackend.model.Court;
+import org.example.padelmaniacbackend.model.CourtOffer;
 import org.example.padelmaniacbackend.model.Match;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -20,10 +21,9 @@ import java.time.LocalDateTime;
 public class CourtOfferDTO {
 
     private Long id;
-    private Match match;
-    private Court court;
+    private CourtDTO court;
     private BigDecimal offeredPrice;
-    private LocalDateTime offerTime;
+    private LocalTime offerTime;
     private String notes;
-    private String status;
+    private CourtOffer.OfferStatus status;
 }
