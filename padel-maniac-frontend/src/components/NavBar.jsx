@@ -7,6 +7,7 @@ const NavBar = () => {
     const [showSearch, setShowSearch] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
+    const role = localStorage.getItem("role");
     const handleSearch = (e) => {
         e.preventDefault();
         console.log('Searching for:', searchQuery);
@@ -31,17 +32,10 @@ const NavBar = () => {
                         <a href="/" className="nav-link">Home</a>
                         <a href="/matches" className="nav-link">Matches</a>
                         <a href="/courts" className="nav-link">Courts</a>
+                        {role !== 'PLAYER' && (<a href="/sendOffer" className="nav-link">Send Offer</a>)}
                     </div>
 
                     <div className="nav-actions">
-                        <button
-                            className="nav-action-btn search-btn"
-                            onClick={() => setShowSearch(!showSearch)}
-                            title="Search"
-                        >
-                            🔍
-                        </button>
-
                         <button
                             className="nav-action-btn create-match-btn"
                             onClick={goToCreatMatch}

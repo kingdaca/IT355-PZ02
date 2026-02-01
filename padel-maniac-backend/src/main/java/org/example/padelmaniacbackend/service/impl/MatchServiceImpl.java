@@ -16,7 +16,9 @@ import org.example.padelmaniacbackend.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,6 +47,7 @@ public class MatchServiceImpl implements MatchService {
         m.setMatchAroundTime(createMatchDTO.getMatchAroundTime());
         m.setMatchStatus(Match.MatchStatus.OPEN);
         m.setMatchOrganizer(p);
+        m.setMatchDuration(createMatchDTO.getMatchDuration());
         matchRepository.save(m);
     }
 
@@ -99,8 +102,8 @@ public class MatchServiceImpl implements MatchService {
         dto.setMatchAroundTime(match.getMatchAroundTime());
         dto.setMatchConfirmedTime(match.getMatchConfirmedTime());
         dto.setNotes(match.getNotes());
+        dto.setMatchDuration(match.getMatchDuration());
 
-        // Konvertuj igrače u DTO
         List<PlayerDTO> playerDTOs = match.getPlayers().stream()
                 .map(player -> {
                     PlayerDTO playerDTO = new PlayerDTO();
@@ -116,7 +119,6 @@ public class MatchServiceImpl implements MatchService {
                 .collect(Collectors.toList());
         dto.setPlayers(playerDTOs);
 
-        // Konvertuj organizatora
         PlayerDTO organizerDTO = new PlayerDTO();
         organizerDTO.setId(match.getMatchOrganizer().getId());
         organizerDTO.setUsername(match.getMatchOrganizer().getUsername());
@@ -136,11 +138,20 @@ public class MatchServiceImpl implements MatchService {
             courtDTO.setId(match.getCourt().getId());
             courtDTO.setCourtName(match.getCourt().getCourtName());
             courtDTO.setPhone(match.getCourt().getPhone());
-            courtDTO.setAddres(match.getCourt().getAddres());
+            courtDTO.setCity(match.getCourt().getCity().getName());
+            courtDTO.setAddress(match.getCourt().getAddress());
             dto.setCourt(courtDTO);
         }
 
         return dto;
+    }
+
+    public List<MatchDTO> getUpcomingMatches(){
+        LocalDate lt
+                = LocalDate.now();
+        List<Match> matches = matchRepository.findUpcomingMatches(lt);
+        List<MatchDTO> matchDTOS = matches.stream().map(this::convertToDTO).collect(Collectors.toList());
+    return matchDTOS;
     }
 
 }

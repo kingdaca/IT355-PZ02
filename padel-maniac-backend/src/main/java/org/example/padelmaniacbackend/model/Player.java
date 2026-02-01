@@ -42,6 +42,10 @@ public class Player {
     @OneToMany(mappedBy = "matchOrganizer", cascade = CascadeType.ALL)
     private List<Match> organizedMatches = new ArrayList<>();
 
+    @OneToOne
+    @JoinColumn(name = "court_id")
+    private Court court;
+
     public enum Level{
         BEGINNER, INTERMEDIATE, ADVANCED
     }

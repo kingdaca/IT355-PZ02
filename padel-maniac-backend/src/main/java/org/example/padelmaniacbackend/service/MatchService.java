@@ -18,4 +18,6 @@ public interface MatchService {
     public MatchDTO matchDetails(Long matchId);
 
     public MatchDTO removeMatch(Long matchId);
+
+    public List<MatchDTO> getUpcomingMatches();
 }

@@ -56,8 +56,8 @@
 }
 
 .filter-btn {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
+    background: #c6ed2c;
+    color: #336699;
     border: 2px solid #c6ed2c;
     padding: 10px 20px;
     border-radius: 8px;
@@ -70,11 +70,6 @@
     font-size: 14px;
 }
 
-.filter-btn:hover,
-.filter-btn.active {
-    background: #c6ed2c;
-    color: #336699;
-}
 
 .search-box {
     position: relative;

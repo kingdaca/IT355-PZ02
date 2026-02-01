@@ -13,7 +13,8 @@ public class CourtDTO {
 
     private Long id;
 
+    private String city;
     private String courtName;
-    private String Addres;
+    private String Address;
     private String phone;
 }

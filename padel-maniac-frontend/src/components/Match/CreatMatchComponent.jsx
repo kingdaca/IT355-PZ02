@@ -25,6 +25,7 @@ const CreateMatch = () => {
         city: '',
         numberOfPlayers: '',
         date: '',
+        matchDuration: '',
         matchAroundTime: '',
         notes: '',
     });
@@ -98,7 +99,7 @@ const CreateMatch = () => {
                 numberOfPlayers: '',
                 date: '',
                 notes: '',
-                aroundTime: ''
+                matchDuration: '',
             });
 
             setTimeout(()=>{
@@ -204,6 +205,33 @@ const CreateMatch = () => {
                             )}
                         </div>
 
+                        <div className="form-group">
+                            <label htmlFor="matchDuration">Match Duration</label>
+                            <select
+                                id="matchDuration"
+                                name="matchDuration"
+                                onChange={handleChange}
+                                value={formData.matchDuration}
+                                className={`form-control ${errors.matchDuration ? 'error' : ''}`}
+                            >
+                                <option value="">Select duration...</option>
+                                {Array.from({length: 7}, (_, i) => {
+                                    const hours = 1 + (i * 0.5);
+                                    const displayValue = hours === Math.floor(hours) ?
+                                        `${hours} hour${hours === 1 ? '' : 's'}` :
+                                        `${hours} hours`;
+                                    return (
+                                        <option key={hours} value={hours}>
+                                            {displayValue}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                            {errors.matchDuration && (
+                                <span className="error-text">{errors.matchDuration}</span>
+                            )}
+                        </div>
+
 
                         <div className="form-group">
                             <label>Location *</label>
@@ -225,6 +253,7 @@ const CreateMatch = () => {
                                 <span className="error-text">{errors.city}</span>
                             )}
                         </div>
+
 
                         <div className="form-group">
                             <label>Notes (Optional)</label>

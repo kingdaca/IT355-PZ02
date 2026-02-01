@@ -60,24 +60,39 @@ const Matches = () => {
 
         // Apply status filter
         if (filters === 'nearby') {
-            // In a real app, this would filter by location
-            result = result.filter(match => match.location.includes('City') || match.location.includes('Central'));
-        } else if (filters === 'need-players') {
-            result = result.filter(match => match.playersNeeded > 0);
+            // Prilagodi ovu logiku - možda treba da filtriraš po gradu ili regionu
+            // Na primer, ako imate cityId u user-u ili lokaciji
+            result = result.filter(match => {
+                // Ovde implementiraj svoju logiku za "nearby"
+                // Na primer: match.location.cityId === userCityId
+                return true; // Za sada prikaži sve
+            });
         } else if (filters === 'today') {
-            result = result.filter(match => match.date.includes('Today'));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            result = result.filter(match => {
+                const matchDate = new Date(match.matchDay);
+                matchDate.setHours(0, 0, 0, 0);
+                return matchDate.getTime() === today.getTime();
+            });
         } else if (filters === 'recommended') {
-            result = result.filter(match => match.organizer.rating >= 4.5);
+            // Ovde implementiraj logiku za preporučene mečeve
+            // Možda po nivou igrača, lokaciji, ili drugim faktorima
+            result = result.filter(match => {
+                // Na primer: match.level === userLevel
+                return true; // Za sada prikaži sve
+            });
         }
 
         // Apply search filter
         if (searchQuery.trim() !== '') {
             const query = searchQuery.toLowerCase();
             result = result.filter(match =>
-                match.location.toLowerCase().includes(query) ||
-                match.level.toLowerCase().includes(query) ||
-                match.organizer.name.toLowerCase().includes(query) ||
-                match.type.toLowerCase().includes(query)
+                match.location?.toLowerCase().includes(query) ||
+                match.matchOrganizer?.firstName?.toLowerCase().includes(query) ||
+                match.matchOrganizer?.lastName?.toLowerCase().includes(query) ||
+                match.notes?.toLowerCase().includes(query)
             );
         }
 
@@ -155,7 +170,6 @@ const Matches = () => {
                 <p>Find and join padel matches in your area. Connect with players of all skill levels.</p>
             </div>
 
-            {/* Filters Section */}
             <div className="filters-section">
                 <div className="filter-group">
                     <button
@@ -169,12 +183,6 @@ const Matches = () => {
                         onClick={() => handleFilterClick('nearby')}
                     >
                         <FontAwesomeIcon icon={faMapMarkerAlt} /> Nearby
-                    </button>
-                    <button
-                        className={`filter-btn ${filters === 'need-players' ? 'active' : ''}`}
-                        onClick={() => handleFilterClick('need-players')}
-                    >
-                        <FontAwesomeIcon icon={faUserFriends} /> Need Players
                     </button>
                     <button
                         className={`filter-btn ${filters === 'today' ? 'active' : ''}`}
@@ -201,7 +209,7 @@ const Matches = () => {
 
             {/* Matches List */}
             <div className="matches-list">
-                {filteredMatches.length > 0 ? (
+                {(
                     filteredMatches.map(match => (
                         <div className="match-card" key={match.id}>
                             <div className="match-header">
@@ -223,6 +231,11 @@ const Matches = () => {
                                     <div className="detail-item">
                                         <FontAwesomeIcon icon={faCalendarDay}/>
                                         <span>Around time:</span> {formatTimeSimple(match.matchAroundTime)}
+                                    </div>
+                                    <div className="detail-item">
+                                        <FontAwesomeIcon icon={faClock}/>
+                                        <span>Duration:</span>
+                                        {match.matchDuration} h
                                     </div>
                                     <div className="detail-item">
                                         <FontAwesomeIcon icon={faMapMarkerAlt}/>
@@ -373,14 +386,6 @@ const Matches = () => {
                             </div>
                         </div>
                     ))
-                ) : (
-                    <div className="no-matches">
-                        <h3><FontAwesomeIcon icon={faSearch}/> No Matches Found</h3>
-                        <p>Try adjusting your filters or create the first match in your area!</p>
-                        <button className="create-match-btn" onClick={handleCreateMatch}>
-                            <FontAwesomeIcon icon={faPlus}/> Create First Match
-                        </button>
-                    </div>
                 )}
             </div>
         </div>

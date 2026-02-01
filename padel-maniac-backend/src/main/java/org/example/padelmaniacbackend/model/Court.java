@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,8 +21,11 @@ public class Court {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "city_id")
-    private City location;
+    private City city;
     private String courtName;
-    private String Addres;
+    private String address;
     private String phone;
+
+    @OneToMany(mappedBy = "court")
+    private List<CourtOffer> offers = new ArrayList<>();
 }

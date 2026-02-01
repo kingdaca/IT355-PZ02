@@ -24,7 +24,7 @@ public class MatchController {
     @PostMapping("/create")
     public ResponseEntity<?> createMatch(@RequestBody CreateMatchDTO createMatchDTO){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName(); // 👈 USERNAME
+        String username = auth.getName();
 
         try {
             matchService.createNewMatch(createMatchDTO, username);
@@ -69,6 +69,15 @@ public class MatchController {
     public ResponseEntity<?> removeMatch(@RequestBody Long matchId){
         try{
             return ResponseEntity.ok(matchService.removeMatch(matchId));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
+        }
+    }
+
+    @GetMapping("/getUpcomingMatches")
+    public ResponseEntity<?> getUpcomingMatches(){
+        try{
+            return ResponseEntity.ok(matchService.getUpcomingMatches());
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
         }

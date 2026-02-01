@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -38,6 +39,9 @@ public class Match {
     private LocalDate matchDay;
     private LocalTime matchAroundTime;
     private LocalTime matchConfirmedTime;
+    private float matchDuration;
+
+    private double price;
 
     @Enumerated(EnumType.STRING)
     private MatchStatus matchStatus;
@@ -48,6 +52,9 @@ public class Match {
     private Player matchOrganizer;
 
     private String notes;
+
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
+    private List<CourtOffer> courtOffers = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "court_id")

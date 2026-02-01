@@ -35,5 +35,9 @@ export default {
         });
     },
 
+    async getUpcomingMatches(){
+        return api.get("/match/getUpcomingMatches")
+    }
+
 
 }

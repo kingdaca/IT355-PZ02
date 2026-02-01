@@ -29,6 +29,7 @@ public class MatchDTO {
     List<PlayerDTO> players;
     private LocalDate matchDay;
     private Match.MatchStatus matchStatus;
+    private float matchDuration;
     private LocalTime matchAroundTime;
     private LocalTime matchConfirmedTime;
     private PlayerDTO matchOrganizer;
