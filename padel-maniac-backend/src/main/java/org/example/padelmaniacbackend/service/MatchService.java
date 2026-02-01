@@ -16,4 +16,6 @@ public interface MatchService {
     public MatchDTO joinToMatch(Long matchId, String username);
 
     public MatchDTO matchDetails(Long matchId);
+
+    public MatchDTO removeMatch(Long matchId);
 }

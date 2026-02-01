@@ -25,7 +25,15 @@ export default {
                 'Content-Type': 'application/json'
             }
         });
-    }
+    },
+
+    async removeMatch(matchId){
+        return api.post("/match/removeMatch", matchId,{
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    },
 
 
 }

@@ -12,7 +12,7 @@ const MatchDetails = () => {
     const [match, setMatch] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const userId = Number(localStorage.getItem("userId"));
     // Dohvati detalje meča
     const fetchMatchDetails = async () => {
         try {
@@ -48,6 +48,16 @@ const MatchDetails = () => {
             alert(err.response?.data?.message || 'Failed to join match');
         }
     };
+
+    const handleRemoveMatch = async () =>{
+        try {
+            const response = MatchService.removeMatch(matchId);
+            navigate("/matches");
+        }catch (err){
+            console.error('Error remove match:', err);
+        }
+
+    }
 
     // Loading state
     if (loading) {
@@ -152,7 +162,7 @@ const MatchDetails = () => {
                 </div>
 
                 {/* Join Button - prikaži ako ima slobodnih mesta */}
-                {match.freePosition > 0 && (
+                {match.freePosition > 0 && match.matchOrganizer.id !== userId &&   (
                     <div className="join-section">
                         <button
                             className="join-button"
@@ -162,6 +172,19 @@ const MatchDetails = () => {
                         </button>
                         <p className="join-note">
                             Click to join this match
+                        </p>
+                    </div>
+                )}
+                {match.matchOrganizer?.id === userId && (
+                    <div className="remove-section">
+                        <button
+                            className="remove-button"
+                            onClick={handleRemoveMatch}
+                        >
+                            ❌ Remove Match
+                        </button>
+                        <p className="remove-note">
+                            This action cannot be undone
                         </p>
                     </div>
                 )}

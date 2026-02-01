@@ -64,4 +64,13 @@ public class MatchController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
         }
     }
+
+    @PostMapping("/removeMatch")
+    public ResponseEntity<?> removeMatch(@RequestBody Long matchId){
+        try{
+            return ResponseEntity.ok(matchService.removeMatch(matchId));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
+        }
+    }
 }

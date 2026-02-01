@@ -327,3 +327,38 @@
         padding: 20px;
     }
 }
+
+/* Remove / Leave Section */
+.remove-section {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    border-radius: 12px;
+    border: 2px solid #ef9a9a;
+    margin-top: 20px;
+}
+
+.remove-button {
+    background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
+    color: white;
+    border: none;
+    padding: 15px 50px;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.remove-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(229, 57, 53, 0.4);
+}
+
+.remove-note {
+    color: #b71c1c;
+    font-size: 14px;
+    margin: 0;
+    font-style: italic;
+}

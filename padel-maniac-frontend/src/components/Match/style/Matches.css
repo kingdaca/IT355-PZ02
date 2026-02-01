@@ -159,6 +159,11 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    color: #c6ed2c;
+
+    span{
+        color: #336699;
+    }
 }
 
 .match-status {

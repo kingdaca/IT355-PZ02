@@ -38,14 +38,11 @@ public class MatchServiceImpl implements MatchService {
     public void createNewMatch(CreateMatchDTO createMatchDTO, String username) {
         Match m = new Match();
         Player p = playerRepository.findByUsername(username);
-        ArrayList<Player> players = new ArrayList<>();
-        players.add(p);
         m.setMatchDay(createMatchDTO.getDate());
         m.setLocation(cityRepository.findByName(createMatchDTO.getCity()));
         m.setNotes(createMatchDTO.getNotes());
         m.setFreePosition(createMatchDTO.getNumberOfPlayers());
         m.setMatchAroundTime(createMatchDTO.getMatchAroundTime());
-        m.setPlayers(players);
         m.setMatchStatus(Match.MatchStatus.OPEN);
         m.setMatchOrganizer(p);
         matchRepository.save(m);
@@ -77,6 +74,14 @@ public class MatchServiceImpl implements MatchService {
 
     public MatchDTO matchDetails(Long matchId){
         return convertToDTO(matchRepository.findById(matchId));
+    }
+
+    public MatchDTO removeMatch(Long matchId){
+        Match m = matchRepository.findById(matchId);
+        m.getPlayers().clear();
+        matchRepository.save(m);
+        matchRepository.delete(m);
+        return convertToDTO(m);
     }
 
 

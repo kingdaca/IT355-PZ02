@@ -27,23 +27,28 @@ import {Link, useNavigate} from "react-router-dom";
 import MatchService from "../../services/MatchService";
 
 const Matches = () => {
+    const [isUserInMatch, setUserInMatch] = useState(false);
     const [errors, setErrors] = useState({});
     useEffect(() => {
         MatchService.getMatches()
             .then(response => {
                 setMatches(response.data);
+
             })
             .catch(error => {
                 console.error(error);
                 setMatches(prev => ({...prev, general: 'Failed to load cities. Please try again.'}));
-            });
+            }).finally(() =>{
+
+        })
     }, []);
 
     const navigate = useNavigate();
+
     const [filters, setFilters] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [matches, setMatches] = useState([]);
-    const [userId, setUserId] = useState(localStorage.getItem("userId"))
+    const [userId, setUserId] = useState(Number(localStorage.getItem("userId")))
 
 
 
@@ -78,6 +83,15 @@ const Matches = () => {
 
         setFilteredMatches(result);
     }, [filters, searchQuery, matches]);
+
+    useEffect(() => {
+        const result = matches.some(match =>
+            match.players?.some(player => player.id === userId)
+        );
+
+        setUserInMatch(result);
+    }, [matches, userId]);
+
 
     const handleFilterClick = (filter) => {
         setFilters(filter);
@@ -193,7 +207,7 @@ const Matches = () => {
                             <div className="match-header">
                                 <div className="match-type">
                                     <FontAwesomeIcon icon={faUsers} />
-                                        Match
+                                        <span>Match</span>
                                 </div>
                                 <div className={`match-status ${getStatusClass(match.matchStatus)}`}>
                                     {getStatusText(match.matchStatus)}
@@ -320,7 +334,8 @@ const Matches = () => {
                                 {/*    </div>*/}
                                 {/*</div>*/}
                                 <div className="match-actions">
-                                    {match.matchStatus === 'OPEN' && match.freePosition > 0 && match.matchOrganizer.id != userId ? (
+                                    {isUserInMatch}
+                                    {match.matchStatus === 'OPEN' && match.freePosition > 0 && match.matchOrganizer.id != userId && !isUserInMatch  ? (
                                         <>
                                             <button
                                                 className="action-btn join-btn"
@@ -329,11 +344,13 @@ const Matches = () => {
 
                                                 <FontAwesomeIcon icon={faSignInAlt}/> Join Match
                                             </button>
-                                            <div
+                                            <Link
+                                                to={`/match/${match.id}`}
                                                 className="action-btn details-btn"
                                             >
-                                                <FontAwesomeIcon icon={faInfoCircle}/> Details
-                                            </div>
+                                                <FontAwesomeIcon icon={faEye} />
+                                                View Details
+                                            </Link>
                                         </>
                                     ) : match.status === 'ongoing' ? (
                                         <button
