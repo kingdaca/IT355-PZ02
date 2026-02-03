@@ -1,4 +1,4 @@
-package org.example.padelmaniacbackend.DTOs.CourtOfferDTO;
+package org.example.padelmaniacbackend.DTOs.OfferDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class CreatCourtOfferDTO {
+public class CreatOfferDTO {
 
     private Long userId;
     private Long matchId;

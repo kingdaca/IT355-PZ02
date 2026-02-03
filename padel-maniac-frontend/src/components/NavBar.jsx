@@ -33,11 +33,9 @@ const NavBar = () => {
                         <a href="/matches" className="nav-link">Matches</a>
                         <a href="/courts" className="nav-link">Courts</a>
                         {role !== 'PLAYER' && (<a href="/sendOffer" className="nav-link">Send Offer</a>)}
-                    </div>
-
-                    <div className="nav-actions">
+                        {role === 'ADMIN' && (<a href="/registrationAsCourt" className="nav-link">Register new court</a>)}
                         <button
-                            className="nav-action-btn create-match-btn"
+                            className="nav-link"
                             onClick={goToCreatMatch}
                             title="Create Match"
                         >
@@ -47,8 +45,9 @@ const NavBar = () => {
                 </div>
 
                 <div className="right-part">
-                    <img src="/user.png" alt="User Profile" className="user-avatar" />
+                    <img src="/user.png" alt="User Profile" className="user-avatar"/>
                     <div className="user-dropdown">
+                    <span>{localStorage.getItem("username")}</span>
                         <span className="dropdown-arrow">▼</span>
                     </div>
                 </div>

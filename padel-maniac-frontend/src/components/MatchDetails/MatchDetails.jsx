@@ -14,9 +14,15 @@ const MatchDetails = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const userId = Number(localStorage.getItem("userId"));
-    const [activeTab, setActiveTab] = useState('details'); // 'details' ili 'offers'
-    const [selectedOffer, setSelectedOffer] = useState(null);
-    const [showAcceptModal, setShowAcceptModal] = useState(false);
+    const [activeTab, setActiveTab] = useState('details');
+    const [showVoteChangeModal, setShowVoteChangeModal] = useState(false);
+    const [offerToVote, setOfferToVote] = useState(null);
+    const [userVotes, setUserVotes] = useState({});
+    const [voteStats, setVoteStats] = useState({
+        totalPlayers: 0,
+        hasVoted: false,
+        userVoteForOffer: null
+    });
 
     // Dohvati detalje meča
     const fetchMatchDetails = async () => {
@@ -34,7 +40,34 @@ const MatchDetails = () => {
     const fetchOffers = async () => {
         try {
             const response = await OfferService.getOffersByMatchId(matchId);
-            setOffers(response.data);
+            const offersData = response.data;
+            setOffers(offersData);
+
+            // Inicijalizuj userVotes i statistike
+            const votesMap = {};
+            let userHasVoted = false;
+            let userVoteForOfferId = null;
+
+            offersData.forEach(offer => {
+                if (offer.votes && Array.isArray(offer.votes)) {
+                    // Proveri da li je trenutni user glasao za ovu ponudu
+                    const hasUserVotedForThis = offer.votes.some(vote => vote.player?.id === userId);
+                    votesMap[offer.id] = hasUserVotedForThis;
+
+                    if (hasUserVotedForThis) {
+                        userHasVoted = true;
+                        userVoteForOfferId = offer.id;
+                    }
+                }
+            });
+
+            setUserVotes(votesMap);
+            setVoteStats({
+                totalPlayers: match?.players?.length || 0,
+                hasVoted: userHasVoted,
+                userVoteForOffer: userVoteForOfferId
+            });
+
         } catch (err) {
             console.error('Error fetching offers:', err);
         } finally {
@@ -46,16 +79,21 @@ const MatchDetails = () => {
     useEffect(() => {
         if (matchId) {
             fetchMatchDetails();
-            fetchOffers();
         }
     }, [matchId]);
+
+    // Kada se match učita, učitaj ponude
+    useEffect(() => {
+        if (match) {
+            fetchOffers();
+        }
+    }, [match]);
 
     // Funkcija za join
     const handleJoinMatch = async () => {
         try {
-            const response = await MatchService.joinMatch(matchId);
+            await MatchService.joinMatch(matchId);
             alert('Successfully joined the match!');
-            // Refresh match details nakon join-a
             fetchMatchDetails();
         } catch (err) {
             console.error('Error joining match:', err);
@@ -65,50 +103,99 @@ const MatchDetails = () => {
 
     const handleRemoveMatch = async () => {
         try {
-            const response = await MatchService.removeMatch(matchId);
+            await MatchService.removeMatch(matchId);
             navigate("/matches");
         } catch (err) {
             console.error('Error remove match:', err);
+            alert(err.response?.data?.message || 'Failed to remove match');
         }
     };
 
-    // Prihvatanje ponude
-    const handleAcceptOffer = async (offerId) => {
+    // Glasanje za ponudu
+    const handleVoteForOffer = async (offerId) => {
+        // Ako je ponuda već prihvaćena ili odbijena, ne može se glasati
+        const offer = offers.find(o => o.id === offerId);
+        if (offer && offer.status !== 'PENDING') {
+            alert(`Cannot vote for ${offer.status.toLowerCase()} offer`);
+            return;
+        }
+
         try {
-            await OfferService.acceptOffer(offerId);
-            alert('✅ Offer accepted successfully!');
-            setShowAcceptModal(false);
-            setSelectedOffer(null);
-            // Refresh offers
-            fetchOffers();
-            fetchMatchDetails(); // Refresh match details jer je sada odabran court
-        } catch (err) {
-            console.error('Error accepting offer:', err);
-            alert(err.response?.data?.message || 'Failed to accept offer');
-        }
-    };
-
-    // Odbijanje ponude
-    const handleRejectOffer = async (offerId) => {
-        if (window.confirm('Are you sure you want to reject this offer?')) {
-            try {
-                await OfferService.rejectOffer(offerId);
-                alert('❌ Offer rejected!');
-                fetchOffers();
-            } catch (err) {
-                console.error('Error rejecting offer:', err);
-                alert(err.response?.data?.message || 'Failed to reject offer');
+            // Proveri da li je user već glasao za neku drugu ponudu
+            if (voteStats.hasVoted && voteStats.userVoteForOffer !== offerId) {
+                // Ako je već glasao, pitaj da li želi da promeni glas
+                setOfferToVote(offerId);
+                setShowVoteChangeModal(true);
+                return;
             }
+
+            // Ako nije glasao, direktno glasaj
+            await performVote(offerId);
+
+        } catch (err) {
+            console.error('Error voting for offer:', err);
+            alert(err.response?.data?.message || 'Failed to vote for offer');
         }
     };
 
-    // Formatiranje vremena
+    // Izvrši glasanje
+    const performVote = async (offerId) => {
+        try {
+            const RequestOfferVoteDTO = {
+                offerId: offerId,
+                playerId: userId
+            };
+
+            await OfferService.vote(RequestOfferVoteDTO);
+
+            // Ažuriraj userVotes - postavi ovaj offer na true, sve ostale na false
+            const newUserVotes = {};
+            offers.forEach(offer => {
+                newUserVotes[offer.id] = offer.id === offerId;
+            });
+            setUserVotes(newUserVotes);
+
+            // Ažuriraj statistike
+            setVoteStats(prev => ({
+                ...prev,
+                hasVoted: true,
+                userVoteForOffer: offerId
+            }));
+
+            // Osveži ponude
+            fetchOffers();
+
+            alert('✅ Vote submitted successfully!');
+        } catch (err) {
+            console.error('Error performing vote:', err);
+            alert(err.response?.data?.message || 'Failed to submit vote');
+        }
+    };
+
+    // Potvrdi promenu glasa
+    const confirmVoteChange = async () => {
+        if (offerToVote) {
+            await performVote(offerToVote);
+            setShowVoteChangeModal(false);
+            setOfferToVote(null);
+        }
+    };
+
+    // Odbaci promenu glasa
+    const cancelVoteChange = () => {
+        setShowVoteChangeModal(false);
+        setOfferToVote(null);
+    };
+
+    // Proveri da li je user učesnik u meču
+    const isParticipant = match?.players?.some(p => p.id === userId);
+    const isOrganizer = match?.matchOrganizer?.id === userId;
+
     const formatTime = (timeString) => {
         if (!timeString) return '';
         return timeString.slice(0, 5);
     };
 
-    // Formatiranje datuma
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
@@ -119,7 +206,39 @@ const MatchDetails = () => {
         });
     };
 
-    // Loading state
+    // Pronađi ponudu sa najviše glasova
+    const getWinningOffer = () => {
+        if (offers.length === 0) return null;
+
+        let maxVotes = 0;
+        let winningOffers = [];
+
+        offers.forEach(offer => {
+            const voteCount = offer.votes?.length || 0;
+            if (voteCount > maxVotes) {
+                maxVotes = voteCount;
+                winningOffers = [offer];
+            } else if (voteCount === maxVotes && voteCount > 0) {
+                winningOffers.push(offer);
+            }
+        });
+
+        // Ako ima više ponuda sa istim brojem glasova
+        if (winningOffers.length > 1) {
+            return {
+                isTie: true,
+                offers: winningOffers,
+                voteCount: maxVotes
+            };
+        }
+
+        return {
+            isTie: false,
+            offer: winningOffers[0],
+            voteCount: maxVotes
+        };
+    };
+
     if (loading) {
         return (
             <div className="match-details-loading">
@@ -129,16 +248,17 @@ const MatchDetails = () => {
         );
     }
 
-    // Error state
-    if (error) {
+    if (error || !match) {
         return (
             <div className="match-details-error">
                 <h2>Error</h2>
-                <p>{error}</p>
+                <p>{error || 'Match not found'}</p>
                 <button onClick={() => navigate('/matches')}>Back to Matches</button>
             </div>
         );
     }
+
+    const winningOffer = getWinningOffer();
 
     return (
         <div className="match-details-container">
@@ -169,12 +289,14 @@ const MatchDetails = () => {
                 >
                     📋 Match Details
                 </button>
-                <button
-                    className={`tab-btn ${activeTab === 'offers' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('offers')}
-                >
-                    💰 Court Offers ({offers.length})
-                </button>
+                {(isParticipant || isOrganizer) && (
+                    <button
+                        className={`tab-btn ${activeTab === 'offers' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('offers')}
+                    >
+                        💰 Courts Offers ({offers.length})
+                    </button>
+                )}
             </div>
 
             {/* Details Tab */}
@@ -183,7 +305,7 @@ const MatchDetails = () => {
                     {/* Match Info */}
                     <div className="match-info-grid">
                         <div className="info-card">
-                            <h3>📅 Date & Time</h3>
+                            <h3>📅 Date & Around Time</h3>
                             <p className="date-primary">{formatDate(match.matchDay)}</p>
                             <p className="date-secondary">{formatTime(match.matchAroundTime)}</p>
                         </div>
@@ -249,8 +371,8 @@ const MatchDetails = () => {
                             ))}
                         </div>
 
-                        {/* Join Button - prikaži ako ima slobodnih mesta */}
-                        {match.freePosition > 0 && match.matchOrganizer.id !== userId && (
+                        {/* Join Button */}
+                        {match.freePosition > 0 && match.matchOrganizer.id !== userId && !isParticipant && (
                             <div className="join-section">
                                 <button
                                     className="join-button"
@@ -263,7 +385,9 @@ const MatchDetails = () => {
                                 </p>
                             </div>
                         )}
-                        {match.matchOrganizer?.id === userId && (
+
+                        {/* Remove Button - samo za organizatora */}
+                        {isOrganizer && (
                             <div className="remove-section">
                                 <button
                                     className="remove-button"
@@ -285,7 +409,46 @@ const MatchDetails = () => {
                 <div className="offers-section">
                     <div className="offers-header">
                         <h2>💰 Court Offers</h2>
-                        <p className="offers-count">{offers.length} offer{offers.length !== 1 ? 's' : ''} received</p>
+                        <div className="voting-info">
+                            <p className="offers-count">{offers.length} offer{offers.length !== 1 ? 's' : ''} received</p>
+
+                            {/* Voting Instructions */}
+                            <p className="voting-instruction">
+                                👆 <strong>Voting System:</strong> All players vote for their preferred court.
+                                The offer with the most votes wins!
+                            </p>
+
+                            {/* Winning Offer Info */}
+                            {winningOffer && winningOffer.voteCount > 0 && (
+                                <div className="winning-offer-info">
+                                    {winningOffer.isTie ? (
+                                        <div className="tie-warning">
+                                            ⚠️ <strong>Tie!</strong> {winningOffer.offers.length} offers have {winningOffer.voteCount} votes each
+                                        </div>
+                                    ) : (
+                                        <div className="leading-offer">
+                                            🏆 <strong>Leading:</strong> {winningOffer.offer.court?.courtName}
+                                            with {winningOffer.voteCount} vote{winningOffer.voteCount !== 1 ? 's' : ''}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* User Voting Status */}
+                            {isParticipant && (
+                                <div className="user-vote-status">
+                                    {voteStats.hasVoted ? (
+                                        <span className="voted-status">
+                                            ✅ You have voted for: {offers.find(o => o.id === voteStats.userVoteForOffer)?.court?.courtName || 'an offer'}
+                                        </span>
+                                    ) : (
+                                        <span className="not-voted-status">
+                                            ⏳ You haven't voted yet. Cast your vote below!
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {offers.length === 0 ? (
@@ -293,152 +456,191 @@ const MatchDetails = () => {
                             <div className="no-offers-icon">💸</div>
                             <h3>No offers yet</h3>
                             <p>Courts haven't sent any offers for this match.</p>
-                            {match.matchOrganizer?.id === userId && (
-                                <p className="hint">Offers will appear here when courts send them.</p>
-                            )}
                         </div>
                     ) : (
                         <div className="offers-list">
-                            {offers.map(offer => (
-                                <div key={offer.id} className={`offer-card status-${offer.status?.toLowerCase()}`}>
-                                    <div className="offer-header">
-                                        <div className="offer-court">
-                                            <h3>{offer.court?.courtName || 'Unknown Court'}</h3>
-                                            <span className="court-city">{offer.court?.city}</span>
-                                        </div>
-                                        <div className="offer-status">
-                                            <span className={`status-badge status-${offer.status?.toLowerCase()}`}>
-                                                {offer.status}
-                                            </span>
-                                        </div>
-                                    </div>
+                            {offers.map(offer => {
+                                const hasUserVotedForThis = userVotes[offer.id] === true;
+                                const userVoteCount = offer.votes?.length || 0;
+                                const totalPlayers = (match.players?.length + 1) || 0;
+                                const isWinning = winningOffer && !winningOffer.isTie &&
+                                    winningOffer.offer?.id === offer.id;
+                                const isTied = winningOffer?.isTie &&
+                                    winningOffer.offers.some(o => o.id === offer.id);
 
-                                    <div className="offer-details">
-                                        <div className="detail-row">
-                                            <span className="detail-label">📍 Address:</span>
-                                            <span className="detail-value">{offer.court?.address}</span>
-                                        </div>
-                                        <div className="detail-row">
-                                            <span className="detail-label">📞 Phone:</span>
-                                            <span className="detail-value">{offer.court?.phone}</span>
-                                        </div>
-                                        <div className="detail-row">
-                                            <span className="detail-label">💰 Price:</span>
-                                            <span className="detail-value price">{offer.offeredPrice} RSD</span>
-                                        </div>
-                                        <div className="detail-row">
-                                            <span className="detail-label">🕐 Offer Time:</span>
-                                            <span className="detail-value">{formatTime(offer.offerTime)}</span>
-                                        </div>
-                                        {offer.notes && (
-                                            <div className="detail-row">
-                                                <span className="detail-label">📝 Notes:</span>
-                                                <span className="detail-value notes">{offer.notes}</span>
+                                return (
+                                    <div key={offer.id} className={`offer-card status-${offer.status?.toLowerCase()} ${isWinning ? 'winning' : ''} ${isTied ? 'tied' : ''}`}>
+                                        {/* Winning/Tied Badge */}
+                                        {isWinning && (
+                                            <div className="winning-badge">
+                                                🏆 Leading with {winningOffer.voteCount} votes
                                             </div>
                                         )}
-                                    </div>
+                                        {isTied && (
+                                            <div className="tied-badge">
+                                                ⚖️ Tied with {winningOffer.voteCount} votes
+                                            </div>
+                                        )}
 
-                                    {/* Actions - samo organizator može da prihvati/odbije */}
-                                    {match.matchOrganizer?.id === userId && (
-                                        <div className="offer-actions">
-                                            {offer.status === 'PENDING' && (
-                                                <>
-                                                    <button
-                                                        className="btn-accept"
-                                                        onClick={() => {
-                                                            setSelectedOffer(offer);
-                                                            setShowAcceptModal(true);
-                                                        }}
-                                                    >
-                                                        ✅ Accept Offer
-                                                    </button>
-                                                    <button
-                                                        className="btn-reject"
-                                                        onClick={() => handleRejectOffer(offer.id)}
-                                                    >
-                                                        ❌ Reject
-                                                    </button>
-                                                </>
-                                            )}
-                                            {offer.status === 'ACCEPTED' && (
-                                                <div className="accepted-badge">
-                                                    ✅ Accepted
+                                        <div className="offer-header">
+                                            <div className="offer-court">
+                                                <h3>{offer.court?.courtName || 'Unknown Court'}</h3>
+                                                <span className="court-city">{offer.court?.city}</span>
+                                            </div>
+                                            <div className="offer-status">
+                                                <span className={`status-badge status-${offer.status?.toLowerCase()}`}>
+                                                    {offer.status}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="offer-details">
+                                            <div className="detail-row">
+                                                <span className="detail-label">📍 Address:</span>
+                                                <span className="detail-value">{offer.court?.address}</span>
+                                            </div>
+                                            <div className="detail-row">
+                                                <span className="detail-label">📞 Phone:</span>
+                                                <span className="detail-value">{offer.court?.phone}</span>
+                                            </div>
+                                            <div className="detail-row">
+                                                <span className="detail-label">💰 Price:</span>
+                                                <span className="detail-value price">{offer.offeredPrice} RSD</span>
+                                            </div>
+                                            <div className="detail-row">
+                                                <span className="detail-label">🕐 Offer Time:</span>
+                                                <span className="detail-value">{formatTime(offer.offerTime)}</span>
+                                            </div>
+                                            {offer.notes && (
+                                                <div className="detail-row">
+                                                    <span className="detail-label">📝 Notes:</span>
+                                                    <span className="detail-value notes">{offer.notes}</span>
                                                 </div>
                                             )}
+
+                                            {/* Voting Stats */}
+                                            <div className="detail-row voting-stats-row">
+                                                <span className="detail-label">👍 Votes:</span>
+                                                <div className="voting-details">
+                                                    <div className="vote-progress">
+                                                        <div className="progress-bar">
+                                                            <div
+                                                                className="progress-fill"
+                                                                style={{
+                                                                    width: `${totalPlayers > 0 ? (userVoteCount / totalPlayers * 100) : 0}%`
+                                                                }}
+                                                            ></div>
+                                                        </div>
+                                                        <span className="votes-count">
+                                                            {userVoteCount} of {totalPlayers} players ({totalPlayers > 0 ? Math.round(userVoteCount / totalPlayers * 100) : 0}%)
+                                                        </span>
+                                                    </div>
+                                                    {offer.votes && offer.votes.length > 0 && (
+                                                        <div className="voters-list">
+                                                            {offer.votes.map((vote, index) => (
+                                                                <div key={index} className="voter-badge" title={`${vote.player?.firstName} ${vote.player?.lastName}`}>
+                                                                    <div className="voter-avatar">
+                                                                        {vote.player?.firstName?.charAt(0) || 'U'}
+                                                                    </div>
+                                                                    <span className="voter-name">
+                                                                        {vote.player?.firstName} {vote.player?.lastName}
+                                                                        {vote.player?.id === userId && ' (You)'}
+                                                                    </span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Voting Actions - za sve učesnike */}
+                                        <div className="offer-actions">
+                                            {offer.status === 'PENDING' && isParticipant && (
+                                                <>
+                                                    {hasUserVotedForThis ? (
+                                                        <div className="vote-status">
+                                                            <span className="voted-badge">✅ You voted for this offer</span>
+                                                            <button
+                                                                className="btn-change-vote"
+                                                                onClick={() => handleVoteForOffer(offer.id)}
+                                                            >
+                                                                Change Vote
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            className="btn-vote"
+                                                            onClick={() => handleVoteForOffer(offer.id)}
+                                                        >
+                                                            👍 Vote for this Court
+                                                        </button>
+                                                    )}
+                                                </>
+                                            )}
+
+                                            {/* Ako nije učesnik */}
+                                            {offer.status === 'PENDING' && !isParticipant && (
+                                                <div className="info-message">
+                                                    Only match participants can vote for offers
+                                                </div>
+                                            )}
+
+                                            {offer.status === 'ACCEPTED' && (
+                                                <div className="accepted-badge">
+                                                    ✅ Accepted (Most votes: {offer.votes?.length || 0})
+                                                </div>
+                                            )}
+
                                             {offer.status === 'REJECTED' && (
                                                 <div className="rejected-badge">
                                                     ❌ Rejected
                                                 </div>
                                             )}
                                         </div>
-                                    )}
-                                </div>
-                            ))}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
             )}
 
-            {/* Accept Offer Modal */}
-            {showAcceptModal && selectedOffer && (
+            {/* Change Vote Modal */}
+            {showVoteChangeModal && (
                 <div className="modal-overlay">
                     <div className="accept-modal">
                         <div className="modal-header">
-                            <h2>✅ Accept Offer</h2>
+                            <h2>🔄 Change Vote</h2>
                             <button
                                 className="modal-close"
-                                onClick={() => {
-                                    setShowAcceptModal(false);
-                                    setSelectedOffer(null);
-                                }}
+                                onClick={cancelVoteChange}
                             >
                                 ×
                             </button>
                         </div>
 
                         <div className="modal-content">
-                            <p>Are you sure you want to accept this offer?</p>
-
-                            <div className="offer-summary">
-                                <h4>Offer Details:</h4>
-                                <div className="summary-item">
-                                    <span>Court:</span>
-                                    <strong>{selectedOffer.court?.courtName}</strong>
-                                </div>
-                                <div className="summary-item">
-                                    <span>Price:</span>
-                                    <strong className="price">{selectedOffer.offeredPrice} RSD</strong>
-                                </div>
-                                <div className="summary-item">
-                                    <span>Time:</span>
-                                    <strong>{formatTime(selectedOffer.offerTime)}</strong>
-                                </div>
-                                <div className="summary-item">
-                                    <span>Address:</span>
-                                    <strong>{selectedOffer.court?.address}</strong>
-                                </div>
-                            </div>
+                            <p>You have already voted for another offer.</p>
+                            <p>Are you sure you want to change your vote?</p>
 
                             <div className="warning-note">
-                                ⚠️ <strong>Note:</strong> Accepting this offer will automatically reject all other offers.
+                                ⚠️ <strong>Note:</strong> Changing your vote will remove your previous vote and may affect which court wins!
                             </div>
                         </div>
 
                         <div className="modal-footer">
                             <button
                                 className="btn-cancel"
-                                onClick={() => {
-                                    setShowAcceptModal(false);
-                                    setSelectedOffer(null);
-                                }}
+                                onClick={cancelVoteChange}
                             >
                                 Cancel
                             </button>
                             <button
                                 className="btn-confirm"
-                                onClick={() => handleAcceptOffer(selectedOffer.id)}
+                                onClick={confirmVoteChange}
                             >
-                                ✅ Yes, Accept Offer
+                                ✅ Yes, Change Vote
                             </button>
                         </div>
                     </div>

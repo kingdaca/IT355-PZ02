@@ -61,13 +61,12 @@ const Login = () => {
             const resp = await authService.login(formData.username, formData.password);
             localStorage.setItem("token", resp.data.token);
             var decode = jwtDecode(resp.data.token)
-            localStorage.setItem("role",decode.role);
+            localStorage.setItem("role",decode.roles[0]);
             localStorage.setItem("userId", decode.userId);
-            console.log(localStorage.getItem("role"))
-
+            localStorage.setItem("username", decode.sub);
             setTimeout(() => {
                 setIsSubmitting(false);
-                navigate("/HomePage")
+                navigate("/")
             }, 1500);
 
         } catch (error) {

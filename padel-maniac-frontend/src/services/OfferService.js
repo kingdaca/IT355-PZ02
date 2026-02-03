@@ -11,6 +11,15 @@ export default {
                 'Content-Type': 'application/json'
             }
         });
+    },
+
+    async vote(RequestOfferVoteDTO){
+        return api.post("/offer/vote",RequestOfferVoteDTO,{
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
     }
+
 
 }

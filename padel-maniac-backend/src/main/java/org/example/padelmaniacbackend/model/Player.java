@@ -1,13 +1,14 @@
 package org.example.padelmaniacbackend.model;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Getter
@@ -48,6 +49,9 @@ public class Player {
     @JoinColumn(name = "court_id")
     @JsonIgnore
     private Court court;
+
+    @OneToMany(mappedBy = "player")
+    private Set<OfferVote> votes = new HashSet<>();
 
     public enum Level{
         BEGINNER, INTERMEDIATE, ADVANCED

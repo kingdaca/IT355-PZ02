@@ -1,7 +1,9 @@
 package org.example.padelmaniacbackend.controller;
 
-import org.example.padelmaniacbackend.DTOs.CourtOfferDTO.CreatCourtOfferDTO;
-import org.example.padelmaniacbackend.service.CourtOfferService;
+import org.example.padelmaniacbackend.DTOs.OfferDTO.CreatOfferDTO;
+import org.example.padelmaniacbackend.DTOs.OfferVoteDTO.OfferVoteRequestDTO;
+import org.example.padelmaniacbackend.service.OfferService;
+import org.example.padelmaniacbackend.service.OfferVoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,15 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/offer")
-public class CourtOfferController {
+public class OfferController {
 
     @Autowired
-    private  CourtOfferService courtOfferService;
+    private OfferService offerService;
+
+    @Autowired
+    private OfferVoteService offerVoteService;
 
     @PostMapping("/creatOffer")
-    public ResponseEntity<?> createOffer(@RequestBody CreatCourtOfferDTO creatCourtOfferDTO){
+    public ResponseEntity<?> createOffer(@RequestBody CreatOfferDTO creatOfferDTO){
         try {
-            courtOfferService.createOffer(creatCourtOfferDTO);
+            offerService.createOffer(creatOfferDTO);
             return ResponseEntity.ok("ok");
         }catch (Exception exception){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
@@ -30,7 +35,17 @@ public class CourtOfferController {
     @PostMapping("/getOffersByMatchId")
     public ResponseEntity<?> getOffersByMatchId(@RequestBody Long matchId){
         try {
-            return ResponseEntity.ok(courtOfferService.findByMatchId(matchId));
+            return ResponseEntity.ok(offerService.findByMatchId(matchId));
+        }catch (Exception exception){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
+        }
+    };
+
+    @PostMapping("/vote")
+    public ResponseEntity<?> vote(@RequestBody OfferVoteRequestDTO offerVoteRequestDTO){
+        try {
+            offerVoteService.vote(offerVoteRequestDTO);
+            return ResponseEntity.ok("Success");
         }catch (Exception exception){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
         }

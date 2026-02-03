@@ -24,5 +24,5 @@ public class Court {
     private String phone;
 
     @OneToMany(mappedBy = "court")
-    private List<CourtOffer> offers = new ArrayList<>();
+    private List<Offer> offers = new ArrayList<>();
 }

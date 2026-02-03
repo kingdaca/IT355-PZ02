@@ -4,15 +4,16 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class CourtOffer {
+public class Offer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,6 +31,10 @@ public class CourtOffer {
     private String notes;
     @Enumerated(EnumType.STRING)
     private OfferStatus status;
+
+    @OneToMany(mappedBy = "offer")
+    private Set<OfferVote> votes = new HashSet<>();
+
 
     public enum OfferStatus{
         PENDING, ACCEPTED, REJECTED

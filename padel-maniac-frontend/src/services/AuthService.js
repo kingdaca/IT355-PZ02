@@ -14,5 +14,13 @@ export default {
                     'Content-Type': 'application/json'
                 }
             })
-        }
+        },
+
+    async registrationCourtOwner(formData){
+        return await api.post('http://localhost:8080/court/registration', formData, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+    }
 }

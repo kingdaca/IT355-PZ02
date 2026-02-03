@@ -27,6 +27,7 @@
 
 .nav-links {
     display: flex;
+    align-items: center;
     gap: 30px;
 }
 
@@ -107,8 +108,10 @@
 }
 
 .user-dropdown {
+    display: flex;
+    gap: 12px;
     color: #336699;
-    font-size: 12px;
+    font-size: 18px;
 }
 
 /* Search Overlay */

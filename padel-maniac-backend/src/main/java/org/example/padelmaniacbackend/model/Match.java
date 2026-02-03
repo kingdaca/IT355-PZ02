@@ -56,7 +56,7 @@ public class Match {
 
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<CourtOffer> courtOffers = new ArrayList<>();
+    private List<Offer> offers = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "court_id")

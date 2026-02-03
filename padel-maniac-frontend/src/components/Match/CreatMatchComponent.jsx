@@ -103,7 +103,7 @@ const CreateMatch = () => {
             });
 
             setTimeout(()=>{
-                navigate("/HomePage")
+                navigate("/")
             })
 
         } catch (error) {

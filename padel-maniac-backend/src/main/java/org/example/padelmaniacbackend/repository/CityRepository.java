@@ -12,4 +12,6 @@ public interface CityRepository extends JpaRepository<City, Integer> {
     List<City> findAll();
 
     City findByName(String name);
+
+    City findById(Long id);
 }

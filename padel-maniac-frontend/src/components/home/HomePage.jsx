@@ -5,11 +5,10 @@ import { faUsers, faTrophy, faCalendarAlt, faMapMarkerAlt, faStar, faHeart } fro
 
 const HomePage = () => {
 
-    const role = localStorage.getItem("role");
+    const role = localStorage.getItem("role")[0];
 
     return (
         <div className="home-container">
-            <NavBar />
 
             {/* Hero Section */}
             <section className="hero-section">

@@ -27,7 +27,6 @@ import {Link, useNavigate} from "react-router-dom";
 import MatchService from "../../services/MatchService";
 
 const Matches = () => {
-    const [isUserInMatch, setUserInMatch] = useState(false);
     const [errors, setErrors] = useState({});
     useEffect(() => {
         MatchService.getMatches()
@@ -99,14 +98,11 @@ const Matches = () => {
         setFilteredMatches(result);
     }, [filters, searchQuery, matches]);
 
-    useEffect(() => {
-        const result = matches.some(match =>
-            match.players?.some(player => player.id === userId)
-        );
 
-        setUserInMatch(result);
-    }, [matches, userId]);
-
+    const isUserInMatch = (matchId) => {
+       var m = matches.find(match => match.id === matchId);
+        return m.players.some(p => p.id === userId);
+    }
 
     const handleFilterClick = (filter) => {
         setFilters(filter);
@@ -347,8 +343,7 @@ const Matches = () => {
                                 {/*    </div>*/}
                                 {/*</div>*/}
                                 <div className="match-actions">
-                                    {isUserInMatch}
-                                    {match.matchStatus === 'OPEN' && match.freePosition > 0 && match.matchOrganizer.id != userId && !isUserInMatch  ? (
+                                    {match.matchStatus === 'OPEN' && match.freePosition > 0 && match.matchOrganizer.id != userId && !isUserInMatch(match.id)  ? (
                                         <>
                                             <button
                                                 className="action-btn join-btn"
