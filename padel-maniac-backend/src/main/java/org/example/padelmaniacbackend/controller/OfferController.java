@@ -4,12 +4,10 @@ import org.example.padelmaniacbackend.DTOs.OfferDTO.CanceorAcceptlOfferDTO;
 import org.example.padelmaniacbackend.DTOs.OfferDTO.CreatOfferDTO;
 import org.example.padelmaniacbackend.DTOs.OfferDTO.GetOffersForCourtDTO;
 import org.example.padelmaniacbackend.DTOs.OfferVoteDTO.OfferVoteRequestDTO;
-import org.example.padelmaniacbackend.model.Player;
-import org.example.padelmaniacbackend.service.AuthService;
+import org.example.padelmaniacbackend.DTOs.matchDTO.MatchIdDTO;
 import org.example.padelmaniacbackend.service.OfferService;
 import org.example.padelmaniacbackend.service.OfferVoteService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,8 +31,8 @@ public class OfferController {
     };
 
     @PostMapping("/getOffersByMatchId")
-    public ResponseEntity<?> getOffersByMatchId(@RequestBody Long matchId){
-        return ResponseEntity.ok(ApiResponse.success(offerService.findByMatchId(matchId)));
+    public ResponseEntity<?> getOffersByMatchId(@RequestBody MatchIdDTO matchIdDTO){
+        return ResponseEntity.ok(ApiResponse.success(offerService.findByMatchId(matchIdDTO.getMatchId())));
     };
 
     @PostMapping("/vote")

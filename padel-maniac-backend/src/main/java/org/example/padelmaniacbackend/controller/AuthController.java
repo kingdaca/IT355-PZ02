@@ -10,7 +10,6 @@ import org.example.padelmaniacbackend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +38,7 @@ public class AuthController {
                 String role = String.valueOf(player.getRole().getName());
                 Long userId = player.getId();
                 String token = jwtTokenProvider.generateToken(player.getUsername(),role, userId);
-                return ResponseEntity.ok(new LoginReponseDTO(token));
+                return ResponseEntity.ok(ApiResponse.success(new LoginReponseDTO(token)));
             }else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("Wrong password");
@@ -57,7 +56,7 @@ public class AuthController {
         }
         registrationDTO.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
         authService.registration(registrationDTO);
-        return ResponseEntity.ok("OK");
+        return ResponseEntity.ok(ApiResponse.success("OK"));
     }
 
 }

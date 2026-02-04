@@ -1,16 +1,13 @@
 package org.example.padelmaniacbackend.controller;
 
 import org.example.padelmaniacbackend.DTOs.matchDTO.CreateMatchDTO;
-import org.example.padelmaniacbackend.DTOs.matchDTO.MatchDTO;
+import org.example.padelmaniacbackend.DTOs.matchDTO.MatchIdDTO;
 import org.example.padelmaniacbackend.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/match")
@@ -24,60 +21,35 @@ public class MatchController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
 
-        try {
-            matchService.createNewMatch(createMatchDTO, username);
-            return ResponseEntity.ok("ok");
-        }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
-        }
+        matchService.createNewMatch(createMatchDTO, username);
+        return ResponseEntity.ok(ApiResponse.success("ok"));
     }
 
     @GetMapping("/getMatches")
     public ResponseEntity<?> getAllMatches(){
-        try {
-            List<MatchDTO> matches = matchService.getMatches();
-            return ResponseEntity.ok(matches);
-        }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
-        }
+        return ResponseEntity.ok(ApiResponse.success(matchService.getMatches()));
     }
 
     @PostMapping("/joinToMatch")
-    public ResponseEntity<?> joinToMatch(@RequestBody Long matchId){
+    public ResponseEntity<?> joinToMatch(@RequestBody MatchIdDTO matchIdDTO){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName(); // 👈 USERNAME
 
-        try{
-            return ResponseEntity.ok(matchService.joinToMatch(matchId, username));
-        }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
-        }
+        return ResponseEntity.ok(ApiResponse.success(matchService.joinToMatch(matchIdDTO.getMatchId(), username)));
     }
 
     @PostMapping("/matchDetails")
-    public ResponseEntity<?> matchDetails(@RequestBody Long matchId){
-        try{
-            return ResponseEntity.ok(matchService.matchDetails(matchId));
-        }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
-        }
+    public ResponseEntity<?> matchDetails(@RequestBody MatchIdDTO matchIdDTO){
+        return ResponseEntity.ok(ApiResponse.success(matchService.matchDetails(matchIdDTO.getMatchId())));
     }
 
     @PostMapping("/removeMatch")
-    public ResponseEntity<?> removeMatch(@RequestBody Long matchId){
-        try{
-            return ResponseEntity.ok(matchService.removeMatch(matchId));
-        }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
-        }
+    public ResponseEntity<?> removeMatch(@RequestBody MatchIdDTO matchIdDTO){
+        return ResponseEntity.ok(ApiResponse.success(matchService.removeMatch(matchIdDTO.getMatchId())));
     }
 
     @GetMapping("/getUpcomingMatches")
     public ResponseEntity<?> getUpcomingMatches(){
-        try{
-            return ResponseEntity.ok(matchService.getUpcomingMatches());
-        }catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
-        }
+        return ResponseEntity.ok(ApiResponse.success(matchService.getUpcomingMatches()));
     }
 }

@@ -45,8 +45,20 @@ public class OfferServiceImpl implements OfferService {
     @Override
     public void createOffer(CreatOfferDTO creatOfferDTO) {
         Player p = playerRepository.findById(creatOfferDTO.getUserId());
+        if (p == null) {
+            throw new ResourceNotFoundException("Player not found");
+        }
+        if (p.getCourt() == null) {
+            throw new ResourceNotFoundException("Court not found for player");
+        }
         Court c = courtRepository.findById(p.getCourt().getId());
+        if (c == null) {
+            throw new ResourceNotFoundException("Court not found");
+        }
         Match m = matchRepository.findById(creatOfferDTO.getMatchId());
+        if (m == null) {
+            throw new ResourceNotFoundException("Match not found");
+        }
         Offer offer = new Offer();
         offer.setCourt(c);
         offer.setOfferTime(creatOfferDTO.getTime());
@@ -62,7 +74,13 @@ public class OfferServiceImpl implements OfferService {
     @Override
     public List<OfferDTO> findByMatchId(Long matchId) {
         Match m = matchRepository.findById(matchId);
+        if (m == null) {
+            throw new ResourceNotFoundException("Match not found");
+        }
         List<Offer> offers = offerRepository.findByMatch(m);
+        if (offers.isEmpty()) {
+            throw new ResourceNotFoundException("Offers is empty");
+        }
        return offers.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -86,6 +104,9 @@ public class OfferServiceImpl implements OfferService {
     @Override
     public Boolean cancelOffer (Long offerId){
         Offer offer = offerRepository.findById(offerId);
+        if (offer == null) {
+            throw new ResourceNotFoundException("Offer not find");
+        }
         offerRepository.delete(offer);
         return true;
     }
@@ -94,15 +115,14 @@ public class OfferServiceImpl implements OfferService {
     @Transactional
     public OfferDTO confirmOffer(Long offerId) {
         Offer offer = offerRepository.findById(offerId);
-        System.out.println(convertToDTO(offer));
-        offer.setStatus(Offer.OfferStatus.CONFIRMED);
-        offerRepository.save(offer);
         if(offer == null){
             throw new ResourceNotFoundException("Offer not find");
         }
+        offer.setStatus(Offer.OfferStatus.CONFIRMED);
+        offerRepository.save(offer);
         Match m = matchRepository.findById(offer.getMatch().getId());
         if(m == null){
-            throw new ResourceNotFoundException("Offer not find");
+            throw new ResourceNotFoundException("Match not found");
         }
         BigDecimal floatAsBigDecimal = BigDecimal.valueOf(m.getMatchDuration());
         BigDecimal result = offer.getOfferedPrice().multiply(floatAsBigDecimal);

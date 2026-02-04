@@ -1,14 +1,12 @@
 package org.example.padelmaniacbackend.DTOs;
 
 import org.example.padelmaniacbackend.DTOs.Court.CourtDTO;
+import org.example.padelmaniacbackend.DTOs.NotificatioDTO.NotificationDTO;
 import org.example.padelmaniacbackend.DTOs.OfferDTO.OfferDTO;
 import org.example.padelmaniacbackend.DTOs.OfferVoteDTO.OfferVoteDTO;
 import org.example.padelmaniacbackend.DTOs.matchDTO.MatchDTO;
 import org.example.padelmaniacbackend.DTOs.playerDTO.PlayerDTO;
-import org.example.padelmaniacbackend.model.Match;
-import org.example.padelmaniacbackend.model.Offer;
-import org.example.padelmaniacbackend.model.OfferVote;
-import org.example.padelmaniacbackend.model.Player;
+import org.example.padelmaniacbackend.model.*;
 import org.example.padelmaniacbackend.repository.CourtRepository;
 import org.example.padelmaniacbackend.repository.MatchRepository;
 import org.example.padelmaniacbackend.repository.OfferRepository;
@@ -125,5 +123,14 @@ public class DTOConverter {
         }
 
         return dto;
+    }
+
+    public NotificationDTO convertToNotificatioDTO(Notification notification){
+        NotificationDTO notificationDTO = new NotificationDTO();
+        notificationDTO.setId(notification.getId());
+        notificationDTO.setRead(notification.isRead());
+        notificationDTO.setMessage(notification.getMessage());
+        notificationDTO.setPlayerId(notification.getPlayer().getId());
+        return notificationDTO;
     }
 }

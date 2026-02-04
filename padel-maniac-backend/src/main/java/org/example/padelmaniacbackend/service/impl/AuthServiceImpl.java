@@ -1,6 +1,7 @@
 package org.example.padelmaniacbackend.service.impl;
 
 import org.example.padelmaniacbackend.DTOs.registration.RegistrationDTO;
+import org.example.padelmaniacbackend.exeption.ResourceNotFoundException;
 import org.example.padelmaniacbackend.model.Player;
 import org.example.padelmaniacbackend.model.Role;
 import org.example.padelmaniacbackend.repository.PlayerRepository;
@@ -23,12 +24,20 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Player login(String username) {
-        return playerRepository.findByUsername(username);
+        Player player = playerRepository.findByUsername(username);
+        if (player == null) {
+            throw new ResourceNotFoundException("Player not found");
+        }
+        return player;
     }
 
     @Override
     public Player registration(RegistrationDTO registrationDTO) {
         Player p = new Player();
+        Role role = roleRepository.findByName(Role.RoleName.PLAYER);
+        if (role == null) {
+            throw new ResourceNotFoundException("Role not found");
+        }
 
         p.setUsername(registrationDTO.getUsername());
         p.setPassword(registrationDTO.getPassword());
@@ -37,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
         p.setLastName(registrationDTO.getLastName());
         p.setPhone(registrationDTO.getPhone());
         p.setLevel(Player.Level.BEGINNER);
-        p.setRole(roleRepository.findByName(Role.RoleName.PLAYER));
+        p.setRole(role);
 
        return playerRepository.save(p);
     }

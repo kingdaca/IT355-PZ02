@@ -33,7 +33,7 @@ const CourtRegistrationForm = () => {
                 setIsLoadingCities(true);
                 // Koristite response.data umesto response.json()
                 const response = await CitiesService.getAllCities();
-                setCities(response.data); // Ovo će vratiti array objekata {id, name}
+                setCities(response.data.data); // Ovo će vratiti array objekata {id, name}
             } catch (error) {
                 console.error('Error fetching cities:', error);
                 setErrors({
@@ -139,7 +139,7 @@ const CourtRegistrationForm = () => {
         } catch (error) {
             if (error.response?.status === 409) {
                 setErrors({
-                    general: `⚠️ ${error.response.data}`
+                    general: `⚠️ ${error.response.data.data}`
                 });
             } else {
                 setErrors({

@@ -48,7 +48,7 @@ const SendOffer = () => {
             const matchesResponse = await MatchService.getUpcomingMatches();
 
             // Filter matches: only OPEN, future, without selected court
-            const filteredMatches = matchesResponse.data.filter(match => {
+            const filteredMatches = matchesResponse.data.data.filter(match => {
                 const matchDate = new Date(match.matchDay);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -61,8 +61,7 @@ const SendOffer = () => {
             setMatches(filteredMatches);
 
         } catch (err) {
-            console.error('Error fetching matches:', err);
-            setError('Failed to load matches. Please try again.');
+            setError(err.response.data.message);
         } finally {
             setLoading(false);
         }

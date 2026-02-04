@@ -13,7 +13,7 @@ const CreateMatch = () => {
     useEffect(() => {
         CitiesService.getAllCities()
             .then(response => {
-                setCities(response.data);
+                setCities(response.data.data);
             })
             .catch(error => {
                 console.error(error);
@@ -112,7 +112,7 @@ const CreateMatch = () => {
             if (error.response) {
                 // Handle backend validation errors
                 if (error.response.status === 400) {
-                    const errorData = error.response.data;
+                    const errorData = error.response.data.data;
                     if (errorData.errors) {
                         // Map backend errors to form fields
                         const backendErrors = {};

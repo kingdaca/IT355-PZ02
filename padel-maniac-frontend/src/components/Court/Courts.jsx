@@ -41,12 +41,12 @@ const Courts = () => {
         try {
             setLoading(true);
             const response = await CourtService.getCourts();
-            setCourts(response.data);
+            setCourts(response.data.data);
 
             // Extract unique cities
             const responseCity = await CitiesService.getAllCities();
-            responseCity.data.push("all");
-            setCities(responseCity.data);
+            responseCity.data.data.push("all");
+            setCities(responseCity.data.data);
 
         } catch (err) {
             console.error('Error fetching courts:', err);
@@ -141,15 +141,15 @@ const Courts = () => {
                 <div className="hero-stats">
                     <div className="stat-item">
                         <span className="stat-number">{courts.length}</span>
-                        <span className="stat-label">Partner Courts</span>
+                        <span className="stat-label-court">Partner Courts</span>
                     </div>
                     <div className="stat-item">
                         <span className="stat-number">{cities.length - 1}</span>
-                        <span className="stat-label">Cities</span>
+                        <span className="stat-label-court">Cities</span>
                     </div>
                     <div className="stat-item">
                         <span className="stat-number">24/7</span>
-                        <span className="stat-label">Booking Available</span>
+                        <span className="stat-label-court">Booking Available</span>
                     </div>
                 </div>
             </div>

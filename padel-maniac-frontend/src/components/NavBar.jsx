@@ -2,6 +2,7 @@ import './navbar.css';
 import { useState } from 'react';
 import CreateMatchModal from "./Match/CreatMatchComponent";
 import {useNavigate} from "react-router-dom";
+import Notification from "./Notification/Notification";
 
 const NavBar = () => {
     const [showSearch, setShowSearch] = useState(false);
@@ -46,11 +47,14 @@ const NavBar = () => {
                 </div>
 
                 <div className="right-part">
-                    <img src="/user.png" alt="User Profile" className="user-avatar"/>
+                    <div className="name">
+                        <img src="/user.png" alt="User Profile" className="user-avatar"/>
+                        <span>{localStorage.getItem("username")}</span>
+                    </div>
                     <div className="user-dropdown">
-                    <span>{localStorage.getItem("username")}</span>
                         <span className="dropdown-arrow">▼</span>
                     </div>
+                    <Notification></Notification>
                 </div>
             </div>
         </>

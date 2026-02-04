@@ -1,6 +1,5 @@
 package org.example.padelmaniacbackend.controller;
 
-import org.example.padelmaniacbackend.model.City;
 import org.example.padelmaniacbackend.repository.CityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +17,6 @@ public class CityController {
 
     @GetMapping("/cities")
     public ResponseEntity<?> getAllCities(){
-        return ResponseEntity.ok(cityRepository.findAll());
+        return ResponseEntity.ok(ApiResponse.success(cityRepository.findAll()));
     }
 }

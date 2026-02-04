@@ -2,19 +2,28 @@ package org.example.padelmaniacbackend.service.impl;
 
 import jakarta.transaction.Transactional;
 import org.example.padelmaniacbackend.DTOs.Court.CourtDTO;
+import org.example.padelmaniacbackend.DTOs.DTOConverter;
 import org.example.padelmaniacbackend.DTOs.matchDTO.CreateMatchDTO;
 import org.example.padelmaniacbackend.DTOs.matchDTO.MatchDTO;
 import org.example.padelmaniacbackend.DTOs.playerDTO.PlayerDTO;
-import org.example.padelmaniacbackend.model.Match;
-import org.example.padelmaniacbackend.model.Player;
+import org.example.padelmaniacbackend.exeption.BusinessException;
+import org.example.padelmaniacbackend.exeption.ResourceNotFoundException;
+import org.example.padelmaniacbackend.model.*;
 import org.example.padelmaniacbackend.repository.CityRepository;
 import org.example.padelmaniacbackend.repository.MatchRepository;
+import org.example.padelmaniacbackend.repository.NotificationRepository;
 import org.example.padelmaniacbackend.repository.PlayerRepository;
 import org.example.padelmaniacbackend.service.MatchService;
+import org.example.padelmaniacbackend.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,12 +40,31 @@ public class MatchServiceImpl implements MatchService {
     @Autowired
     private CityRepository cityRepository;
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    private final SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private DTOConverter converter;
+
+    public MatchServiceImpl(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
+
     @Override
     public void createNewMatch(CreateMatchDTO createMatchDTO, String username) {
         Match m = new Match();
         Player p = playerRepository.findByUsername(username);
+        if (p == null) {
+            throw new ResourceNotFoundException("Player not found");
+        }
+        City city = cityRepository.findByName(createMatchDTO.getCity());
+        if (city == null) {
+            throw new ResourceNotFoundException("City not found");
+        }
         m.setMatchDay(createMatchDTO.getDate());
-        m.setLocation(cityRepository.findByName(createMatchDTO.getCity()));
+        m.setLocation(city);
         m.setNotes(createMatchDTO.getNotes());
         m.setFreePosition(createMatchDTO.getNumberOfPlayers());
         m.setMatchAroundTime(createMatchDTO.getMatchAroundTime());
@@ -56,6 +84,15 @@ public class MatchServiceImpl implements MatchService {
     public MatchDTO joinToMatch(Long matchId, String username) {
         Player p = playerRepository.findByUsername(username);
         Match m = matchRepository.findById(matchId);
+        if (p == null) {
+            throw new ResourceNotFoundException("Player not found");
+        }
+        if (m == null) {
+            throw new ResourceNotFoundException("Match not found");
+        }
+        if (m.getFreePosition() <= 0) {
+            throw new BusinessException("Match is full");
+        }
 
         m.getPlayers().add(p);
 
@@ -67,15 +104,44 @@ public class MatchServiceImpl implements MatchService {
 
         matchRepository.save(m);
 
+        String message = "You have a new player in match at " +m.getMatchDay() + " " +m.getMatchAroundTime() ;
+
+        Notification organizerNotification = new Notification();
+        organizerNotification.setMessage(message);
+        organizerNotification.setSentAt(LocalDateTime.now(ZoneOffset.UTC));
+        organizerNotification.setPlayer(m.getMatchOrganizer());
+        notificationRepository.save(organizerNotification);
+        messagingTemplate.convertAndSend("/topic/notifications/"+m.getMatchOrganizer().getId(),converter.convertToNotificatioDTO(organizerNotification));
+
+
+        for (Player player : m.getPlayers()) {
+            Notification notification = new Notification();
+            notification.setMessage(message);
+            notification.setSentAt(LocalDateTime.now(ZoneOffset.UTC));
+            notification.setPlayer(player);
+            notificationRepository.save(notification);
+            messagingTemplate.convertAndSend("/topic/notifications/"+player.getId(),converter.convertToNotificatioDTO(notification));
+
+
+        }
+
+
         return convertToDTO(m);
     }
 
     public MatchDTO matchDetails(Long matchId){
-        return convertToDTO(matchRepository.findById(matchId));
+        Match match = matchRepository.findById(matchId);
+        if (match == null) {
+            throw new ResourceNotFoundException("Match not found");
+        }
+        return convertToDTO(match);
     }
 
     public MatchDTO removeMatch(Long matchId){
         Match m = matchRepository.findById(matchId);
+        if (m == null) {
+            throw new ResourceNotFoundException("Match not found");
+        }
         m.getPlayers().clear();
         matchRepository.save(m);
         matchRepository.delete(m);
@@ -90,6 +156,9 @@ public class MatchServiceImpl implements MatchService {
     }
 
     private MatchDTO convertToDTO(Match match) {
+        if (match == null) {
+            throw new ResourceNotFoundException("Match not found");
+        }
         MatchDTO dto = new MatchDTO();
         dto.setId(match.getId());
         dto.setFreePosition(match.getFreePosition());
@@ -145,6 +214,9 @@ public class MatchServiceImpl implements MatchService {
         LocalDate lt
                 = LocalDate.now();
         List<Match> matches = matchRepository.findUpcomingMatches(lt);
+        if (matches.isEmpty()) {
+            throw new ResourceNotFoundException("No upcoming matches");
+        }
         List<MatchDTO> matchDTOS = matches.stream().map(this::convertToDTO).collect(Collectors.toList());
     return matchDTOS;
     }

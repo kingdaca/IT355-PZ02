@@ -31,7 +31,7 @@ const Matches = () => {
     useEffect(() => {
         MatchService.getMatches()
             .then(response => {
-                setMatches(response.data);
+                setMatches(response.data.data);
 
             })
             .catch(error => {
@@ -118,7 +118,7 @@ const Matches = () => {
 
             setMatches(prev =>
                 prev.map(m =>
-                    m.id === response.data.id ? response.data : m
+                    m.id === response.data.data.id ? response.data.data : m
                 )
             );
         }catch(error){
@@ -190,7 +190,7 @@ const Matches = () => {
                     </button>
                 </div>
 
-                <div className="search-box">
+                <div className="search-box-match">
                     <FontAwesomeIcon icon={faSearch} />
                     <input
                         type="text"
@@ -228,7 +228,15 @@ const Matches = () => {
                                     </div>
                                     <div className="detail-item">
                                         <FontAwesomeIcon icon={faCalendarDay}/>
-                                        <span>Around time:</span> {formatTimeSimple(match.matchAroundTime)}
+                                        {!match.matchScheduledTime ?(
+                                            <>
+                                                <span>Around time:</span> {formatTimeSimple(match.matchAroundTime)}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>Scheduled time:</span> {formatTimeSimple(match.matchScheduledTime)}
+                                            </>
+                                        )}
                                     </div>
                                     <div className="detail-item">
                                         <FontAwesomeIcon icon={faClock}/>

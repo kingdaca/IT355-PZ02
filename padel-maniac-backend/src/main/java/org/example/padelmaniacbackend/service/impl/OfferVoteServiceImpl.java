@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.example.padelmaniacbackend.DTOs.DTOConverter;
 import org.example.padelmaniacbackend.DTOs.OfferVoteDTO.OfferVoteRequestDTO;
 import org.example.padelmaniacbackend.exeption.BusinessException;
+import org.example.padelmaniacbackend.exeption.ResourceNotFoundException;
 import org.example.padelmaniacbackend.model.Match;
 import org.example.padelmaniacbackend.model.Offer;
 import org.example.padelmaniacbackend.model.OfferVote;
@@ -37,6 +38,12 @@ public class OfferVoteServiceImpl implements OfferVoteService {
     public void vote(OfferVoteRequestDTO offerVoteRequestDTO) {
         Offer offer = offerRepository.findById(offerVoteRequestDTO.getOfferId());
         Player p = playerRepository.findById(offerVoteRequestDTO.getPlayerId());
+        if (offer == null) {
+            throw new ResourceNotFoundException("Offer not find");
+        }
+        if (p == null) {
+            throw new ResourceNotFoundException("Player not found");
+        }
 
         if(offerVoteRepository.existsByPlayerAndMatch(p.getId(),offer.getMatch().getId())){
             throw new BusinessException("Već ste glasali za ovaj meč. Možete glasati samo jednom.");

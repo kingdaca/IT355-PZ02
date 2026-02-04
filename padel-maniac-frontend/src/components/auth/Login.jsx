@@ -1,7 +1,7 @@
 import { useState } from "react";
 import './style/Registration.css';
 import authService from "../../services/AuthService";
-import {Link} from "react-router-dom";
+import {data, Link} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
@@ -59,8 +59,8 @@ const Login = () => {
 
         try {
             const resp = await authService.login(formData.username, formData.password);
-            localStorage.setItem("token", resp.data.token);
-            var decode = jwtDecode(resp.data.token)
+            localStorage.setItem("token", resp.data.data.token);
+            var decode = jwtDecode(resp.data.data.token)
             localStorage.setItem("role",decode.roles[0]);
             localStorage.setItem("userId", decode.userId);
             localStorage.setItem("username", decode.sub);

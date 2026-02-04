@@ -26,7 +26,7 @@ const MatchDetails = () => {
         try {
             setLoading(true);
             const response = await MatchService.mathcDetails(matchId);
-            setMatch(response.data);
+            setMatch(response.data.data);
             setError(null);
         } catch (err) {
             console.error('Error fetching match details:', err);
@@ -90,7 +90,7 @@ const MatchDetails = () => {
             fetchMatchDetails();
         } catch (err) {
             console.error('Error joining match:', err);
-            alert(err.response?.data?.message || 'Failed to join match');
+            alert(err.response?.data?.data.message || 'Failed to join match');
         }
     };
 
@@ -100,7 +100,7 @@ const MatchDetails = () => {
             navigate("/matches");
         } catch (err) {
             console.error('Error remove match:', err);
-            alert(err.response?.data?.message || 'Failed to remove match');
+            alert(err.response?.data?.data.message || 'Failed to remove match');
         }
     };
 

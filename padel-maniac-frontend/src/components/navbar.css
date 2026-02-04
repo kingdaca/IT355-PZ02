@@ -28,7 +28,7 @@
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 16px;
 }
 
 .nav-link {
@@ -36,7 +36,7 @@
     text-decoration: none;
     font-weight: 600;
     font-size: 16px;
-    padding: 8px 12px;
+    padding: 4px 8px;
     border-radius: 8px;
     transition: all 0.3s ease;
 }
@@ -97,18 +97,27 @@
     align-items: center;
     gap: 10px;
     cursor: pointer;
+
+    .name{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #336699;
+        text-decoration: none;
+        font-weight: 600;
+    }
 }
 
 .right-part img {
-    height: 64px;
-    width: 64px;
+    height: 48px;
+    width: 48px;
     border-radius: 50%;
     border: 3px solid #336699;
     object-fit: cover;
 }
 
 .user-dropdown {
-    display: flex;
+    display: none;
     gap: 12px;
     color: #336699;
     font-size: 18px;
@@ -357,12 +366,11 @@
     }
 
     .nav-links {
-        gap: 15px;
-    }
+        gap: 12px;}
 
     .nav-link {
         font-size: 14px;
-        padding: 6px 10px;
+        align-items: center;
     }
 
     .create-match-btn {
@@ -372,6 +380,10 @@
 }
 
 @media (max-width: 768px) {
+    .user-dropdown{
+        display: flex;
+    }
+
     .nav-bar {
         padding: 0px 15px;
         height: 70px;
