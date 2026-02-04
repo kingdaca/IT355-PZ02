@@ -37,7 +37,7 @@ public class Offer {
 
 
     public enum OfferStatus{
-        PENDING, ACCEPTED, REJECTED
+        PENDING, ACCEPTED, REJECTED, CONFIRMED
     }
 
 

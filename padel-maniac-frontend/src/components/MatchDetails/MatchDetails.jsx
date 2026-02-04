@@ -1,8 +1,6 @@
-// MatchDetails.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './MatchDetails.css';
-
 import MatchService from "../../services/MatchService";
 import OfferService from "../../services/OfferService";
 
@@ -17,7 +15,6 @@ const MatchDetails = () => {
     const [activeTab, setActiveTab] = useState('details');
     const [showVoteChangeModal, setShowVoteChangeModal] = useState(false);
     const [offerToVote, setOfferToVote] = useState(null);
-    const [userVotes, setUserVotes] = useState({});
     const [voteStats, setVoteStats] = useState({
         totalPlayers: 0,
         hasVoted: false,
@@ -40,30 +37,26 @@ const MatchDetails = () => {
     const fetchOffers = async () => {
         try {
             const response = await OfferService.getOffersByMatchId(matchId);
-            const offersData = response.data;
+            const offersData = response.data.data;
             setOffers(offersData);
 
-            // Inicijalizuj userVotes i statistike
-            const votesMap = {};
-            let userHasVoted = false;
+            // Svi igrači (uključujući organizatora) mogu da glasaju
+            // Proveri sve ponude da vidiš da li je trenutni korisnik glasao
             let userVoteForOfferId = null;
+            let userHasVoted = false;
 
             offersData.forEach(offer => {
                 if (offer.votes && Array.isArray(offer.votes)) {
-                    // Proveri da li je trenutni user glasao za ovu ponudu
-                    const hasUserVotedForThis = offer.votes.some(vote => vote.player?.id === userId);
-                    votesMap[offer.id] = hasUserVotedForThis;
-
-                    if (hasUserVotedForThis) {
+                    const userVote = offer.votes.find(vote => vote.player?.id === userId);
+                    if (userVote) {
                         userHasVoted = true;
                         userVoteForOfferId = offer.id;
                     }
                 }
             });
 
-            setUserVotes(votesMap);
             setVoteStats({
-                totalPlayers: match?.players?.length || 0,
+                totalPlayers: (match?.players?.length || 0) + 1, // +1 za organizatora
                 hasVoted: userHasVoted,
                 userVoteForOffer: userVoteForOfferId
             });
@@ -113,6 +106,15 @@ const MatchDetails = () => {
 
     // Glasanje za ponudu
     const handleVoteForOffer = async (offerId) => {
+        // Proveri da li je korisnik učesnik meča (igrač ILI organizator)
+        const isParticipant = match?.players?.some(p => p.id === userId);
+        const isOrganizer = match?.matchOrganizer?.id === userId;
+
+        if (!isParticipant && !isOrganizer) {
+            alert("Only match participants can vote for offers");
+            return;
+        }
+
         // Ako je ponuda već prihvaćena ili odbijena, ne može se glasati
         const offer = offers.find(o => o.id === offerId);
         if (offer && offer.status !== 'PENDING') {
@@ -120,10 +122,15 @@ const MatchDetails = () => {
             return;
         }
 
+        // Ako je već glasao za ovu ponudu, ne radi ništa
+        if (voteStats.userVoteForOffer === offerId) {
+            alert("You have already voted for this offer!");
+            return;
+        }
+
         try {
-            // Proveri da li je user već glasao za neku drugu ponudu
+            // Ako je već glasao za neku drugu ponudu, pitaj da li želi da promeni glas
             if (voteStats.hasVoted && voteStats.userVoteForOffer !== offerId) {
-                // Ako je već glasao, pitaj da li želi da promeni glas
                 setOfferToVote(offerId);
                 setShowVoteChangeModal(true);
                 return;
@@ -134,7 +141,8 @@ const MatchDetails = () => {
 
         } catch (err) {
             console.error('Error voting for offer:', err);
-            alert(err.response?.data?.message || 'Failed to vote for offer');
+            const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Failed to vote for offer';
+            alert(errorMessage);
         }
     };
 
@@ -148,27 +156,21 @@ const MatchDetails = () => {
 
             await OfferService.vote(RequestOfferVoteDTO);
 
-            // Ažuriraj userVotes - postavi ovaj offer na true, sve ostale na false
-            const newUserVotes = {};
-            offers.forEach(offer => {
-                newUserVotes[offer.id] = offer.id === offerId;
-            });
-            setUserVotes(newUserVotes);
-
-            // Ažuriraj statistike
-            setVoteStats(prev => ({
-                ...prev,
-                hasVoted: true,
-                userVoteForOffer: offerId
-            }));
-
-            // Osveži ponude
-            fetchOffers();
+            // Osveži ponude da dobijemo ažurirane glasove
+            await fetchOffers();
 
             alert('✅ Vote submitted successfully!');
         } catch (err) {
             console.error('Error performing vote:', err);
-            alert(err.response?.data?.message || 'Failed to submit vote');
+            const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Failed to submit vote';
+
+            // Ako je greška "već glasao", osveži ponude da dobijemo tačne podatke
+            if (err.response?.data?.code === 'ALREADY_VOTED' ||
+                err.response?.status === 409) {
+                await fetchOffers();
+            }
+
+            alert(errorMessage);
         }
     };
 
@@ -187,9 +189,10 @@ const MatchDetails = () => {
         setOfferToVote(null);
     };
 
-    // Proveri da li je user učesnik u meču
+    // Proveri da li je user učesnik u meču (igrač ILI organizator)
     const isParticipant = match?.players?.some(p => p.id === userId);
     const isOrganizer = match?.matchOrganizer?.id === userId;
+    const isMatchMember = isParticipant || isOrganizer;
 
     const formatTime = (timeString) => {
         if (!timeString) return '';
@@ -214,12 +217,14 @@ const MatchDetails = () => {
         let winningOffers = [];
 
         offers.forEach(offer => {
-            const voteCount = offer.votes?.length || 0;
-            if (voteCount > maxVotes) {
-                maxVotes = voteCount;
-                winningOffers = [offer];
-            } else if (voteCount === maxVotes && voteCount > 0) {
-                winningOffers.push(offer);
+            if (offer.status === 'PENDING') {
+                const voteCount = offer.votes?.length || 0;
+                if (voteCount > maxVotes) {
+                    maxVotes = voteCount;
+                    winningOffers = [offer];
+                } else if (voteCount === maxVotes && voteCount > 0) {
+                    winningOffers.push(offer);
+                }
             }
         });
 
@@ -289,7 +294,7 @@ const MatchDetails = () => {
                 >
                     📋 Match Details
                 </button>
-                {(isParticipant || isOrganizer) && (
+                {isMatchMember && (
                     <button
                         className={`tab-btn ${activeTab === 'offers' ? 'active' : ''}`}
                         onClick={() => setActiveTab('offers')}
@@ -305,16 +310,26 @@ const MatchDetails = () => {
                     {/* Match Info */}
                     <div className="match-info-grid">
                         <div className="info-card">
-                            <h3>📅 Date & Around Time</h3>
-                            <p className="date-primary">{formatDate(match.matchDay)}</p>
-                            <p className="date-secondary">{formatTime(match.matchAroundTime)}</p>
-                        </div>
+                            {match.matchStatus !== 'SCHEDULED' ? (
+                                <>
+                                    <h3>📅 Date & Around Time</h3>
+                                    <p className="date-primary">{formatDate(match.matchDay)}</p>
+                                    <p className="date-secondary">{formatTime(match.matchAroundTime)}</p>
+                                </>
+                            ) : (
+                                <>
+                                    <h3>📅 Date & Scheduled Time</h3>
+                                    <p className="date-primary">{formatDate(match.matchDay)}</p>
+                                    <p className="date-secondary">{formatTime(match.matchScheduledTime)}</p>
+                                </>
+                            )}
+                    </div>
 
-                        <div className="info-card">
-                            <h3>📍 Location</h3>
-                            <p>{match.location}</p>
-                            {match.court && (
-                                <div className="court-info">
+                    <div className="info-card">
+                        <h3>📍 Location</h3>
+                        <p>{match.location}</p>
+                        {match.court && (
+                            <div className="court-info">
                                     <p><strong>Selected Court:</strong></p>
                                     <p>{match.court.courtName}</p>
                                     <p>{match.court.address}</p>
@@ -325,7 +340,7 @@ const MatchDetails = () => {
                         <div className="info-card">
                             <h3>👥 Players</h3>
                             <p className="players-count">
-                                {match.players?.length || 0} / {match.players?.length + match.freePosition}
+                                {match.players?.length + 1 || 0} / {match.players?.length + match.freePosition + 1}
                             </p>
                             <p className={match.freePosition > 0 ? 'available' : 'full'}>
                                 {match.freePosition > 0
@@ -349,6 +364,28 @@ const MatchDetails = () => {
 
                         {/* Player List */}
                         <div className="players-list">
+                            {/* Prikaži organizatora prvo */}
+                            {match.matchOrganizer && (
+                                <div key={match.matchOrganizer.id} className="player-card organizer">
+                                    <div className="player-avatar">
+                                        {match.matchOrganizer.firstName?.charAt(0)}
+                                    </div>
+                                    <div className="player-info">
+                                        <h4>
+                                            {match.matchOrganizer.firstName} {match.matchOrganizer.lastName} 👑 (Organizer)
+                                        </h4>
+                                        <p>Level: {match.matchOrganizer.level}</p>
+                                        {match.matchOrganizer.email && (
+                                            <div className="contact-info">
+                                                <p>Email: {match.matchOrganizer.email}</p>
+                                                {match.matchOrganizer.phone && <p>Phone: {match.matchOrganizer.phone}</p>}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Prikaži ostale igrače */}
                             {match.players?.map(player => (
                                 <div key={player.id} className="player-card">
                                     <div className="player-avatar">
@@ -357,7 +394,6 @@ const MatchDetails = () => {
                                     <div className="player-info">
                                         <h4>
                                             {player.firstName} {player.lastName}
-                                            {player.id === match.matchOrganizer?.id && ' 👑'}
                                         </h4>
                                         <p>Level: {player.level}</p>
                                         {player.email && (
@@ -414,7 +450,7 @@ const MatchDetails = () => {
 
                             {/* Voting Instructions */}
                             <p className="voting-instruction">
-                                👆 <strong>Voting System:</strong> All players vote for their preferred court.
+                                👆 <strong>Voting System:</strong> All match members (players + organizer) vote for their preferred court.
                                 The offer with the most votes wins!
                             </p>
 
@@ -435,7 +471,7 @@ const MatchDetails = () => {
                             )}
 
                             {/* User Voting Status */}
-                            {isParticipant && (
+                            {isMatchMember && (
                                 <div className="user-vote-status">
                                     {voteStats.hasVoted ? (
                                         <span className="voted-status">
@@ -460,13 +496,15 @@ const MatchDetails = () => {
                     ) : (
                         <div className="offers-list">
                             {offers.map(offer => {
-                                const hasUserVotedForThis = userVotes[offer.id] === true;
                                 const userVoteCount = offer.votes?.length || 0;
-                                const totalPlayers = (match.players?.length + 1) || 0;
+                                const totalPlayers = voteStats.totalPlayers; // Ukupan broj učesnika (igrači + organizator)
                                 const isWinning = winningOffer && !winningOffer.isTie &&
                                     winningOffer.offer?.id === offer.id;
                                 const isTied = winningOffer?.isTie &&
                                     winningOffer.offers.some(o => o.id === offer.id);
+
+                                // Proveri da li je trenutni korisnik glasao za ovu ponudu
+                                const hasUserVotedForThis = voteStats.userVoteForOffer === offer.id;
 
                                 return (
                                     <div key={offer.id} className={`offer-card status-${offer.status?.toLowerCase()} ${isWinning ? 'winning' : ''} ${isTied ? 'tied' : ''}`}>
@@ -532,7 +570,7 @@ const MatchDetails = () => {
                                                             ></div>
                                                         </div>
                                                         <span className="votes-count">
-                                                            {userVoteCount} of {totalPlayers} players ({totalPlayers > 0 ? Math.round(userVoteCount / totalPlayers * 100) : 0}%)
+                                                            {userVoteCount} of {totalPlayers} members ({totalPlayers > 0 ? Math.round(userVoteCount / totalPlayers * 100) : 0}%)
                                                         </span>
                                                     </div>
                                                     {offer.votes && offer.votes.length > 0 && (
@@ -545,6 +583,7 @@ const MatchDetails = () => {
                                                                     <span className="voter-name">
                                                                         {vote.player?.firstName} {vote.player?.lastName}
                                                                         {vote.player?.id === userId && ' (You)'}
+                                                                        {vote.player?.id === match.matchOrganizer?.id && ' 👑'}
                                                                     </span>
                                                                 </div>
                                                             ))}
@@ -554,35 +593,44 @@ const MatchDetails = () => {
                                             </div>
                                         </div>
 
-                                        {/* Voting Actions - za sve učesnike */}
+                                        {/* Voting Actions - za sve učesnike meča */}
                                         <div className="offer-actions">
-                                            {offer.status === 'PENDING' && isParticipant && (
+                                            {offer.status === 'PENDING' && isMatchMember && (
                                                 <>
+                                                    {/* Ako je korisnik glasao za ovu ponudu */}
                                                     {hasUserVotedForThis ? (
                                                         <div className="vote-status">
                                                             <span className="voted-badge">✅ You voted for this offer</span>
-                                                            <button
-                                                                className="btn-change-vote"
-                                                                onClick={() => handleVoteForOffer(offer.id)}
-                                                            >
-                                                                Change Vote
-                                                            </button>
                                                         </div>
                                                     ) : (
-                                                        <button
-                                                            className="btn-vote"
-                                                            onClick={() => handleVoteForOffer(offer.id)}
-                                                        >
-                                                            👍 Vote for this Court
-                                                        </button>
+                                                        /* Ako nije glasao za ovu ponudu */
+                                                        <div className="vote-options">
+                                                            {/* Ako je korisnik već glasao za neku drugu ponudu */}
+                                                            {voteStats.hasVoted ? (
+                                                                <button
+                                                                    className="btn-change-vote"
+                                                                    onClick={() => handleVoteForOffer(offer.id)}
+                                                                >
+                                                                    🔄 Change Vote
+                                                                </button>
+                                                            ) : (
+                                                                /* Ako korisnik još uvek nije glasao ni za jednu ponudu */
+                                                                <button
+                                                                    className="btn-vote"
+                                                                    onClick={() => handleVoteForOffer(offer.id)}
+                                                                >
+                                                                    👍 Vote for this Court
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     )}
                                                 </>
                                             )}
 
-                                            {/* Ako nije učesnik */}
-                                            {offer.status === 'PENDING' && !isParticipant && (
+                                            {/* Ako nije učesnik meča */}
+                                            {offer.status === 'PENDING' && !isMatchMember && (
                                                 <div className="info-message">
-                                                    Only match participants can vote for offers
+                                                    Only match members can vote for offers
                                                 </div>
                                             )}
 

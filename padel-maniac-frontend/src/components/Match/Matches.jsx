@@ -139,6 +139,7 @@ const Matches = () => {
             case 'FULL': return 'full';
             case 'ONGOING': return 'ongoing';
             case 'CANCELED': return 'canceled';
+            case 'SCHEDULED': return 'scheduled';
             case 'ENDED': return 'ended';
             default: return '';
         }
@@ -148,6 +149,7 @@ const Matches = () => {
         switch (status) {
             case 'OPEN': return 'Open';
             case 'FULL': return 'Full';
+            case 'SCHEDULED': return 'scheduled';
             case 'ONGOING': return 'Ongoing';
             case 'CANCELED': return 'Canceled';
             case 'ENDED': return 'Ended';
@@ -257,12 +259,37 @@ const Matches = () => {
                                     </div>
 
                                     <div className="player-slots-container">
-                                        {/* Prikaz trenutnih igrača */}
                                         <div className="current-players">
                                             <div className="players-label">Joined Players
                                                 ({match.players.length}/{match.players.length + match.freePosition}):
                                             </div>
                                             <div className="players-list">
+
+                                                    <div
+                                                        key={match.matchOrganizer.id}
+                                                        className={`player-badge ${match.matchOrganizer.id === match.matchOrganizer?.id ? 'organizer' : ''}`}
+                                                        title={match.matchOrganizer.id === match.matchOrganizer?.id ? 'Organizer' : 'Player'}
+                                                    >
+                                                        <div className="player-avatar">
+                                                            {match.matchOrganizer.id.firstName?.charAt(0) || 'P'}
+                                                        </div>
+                                                        <div className="player-info">
+                                                            <div className="player-name">
+                                                                {match.matchOrganizer.firstName} {match.matchOrganizer.lastName}
+                                                                {match.matchOrganizer.id === match.matchOrganizer?.id && (
+                                                                    <span className="organizer-tag">👑</span>
+                                                                )}
+                                                            </div>
+                                                            <div className="player-level">
+                                                                {match.matchOrganizer.level && (
+                                                                    <span
+                                                                        className={`level-badge level-${match.matchOrganizer.level.toLowerCase()}`}>
+                                                                        {match.matchOrganizer.level}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 {match.players.map((player, index) => (
                                                     <div
                                                         key={player.id || index}
@@ -283,8 +310,8 @@ const Matches = () => {
                                                                 {player.level && (
                                                                     <span
                                                                         className={`level-badge level-${player.level.toLowerCase()}`}>
-                                        {player.level}
-                                    </span>
+                                                                        {player.level}
+                                                                    </span>
                                                                 )}
                                                             </div>
                                                         </div>

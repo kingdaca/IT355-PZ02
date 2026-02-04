@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.example.padelmaniacbackend.DTOs.Court.CourtDTO;
 import org.example.padelmaniacbackend.DTOs.OfferVoteDTO.OfferVoteDTO;
+import org.example.padelmaniacbackend.DTOs.matchDTO.MatchDTO;
+import org.example.padelmaniacbackend.model.Match;
 import org.example.padelmaniacbackend.model.Offer;
 import org.example.padelmaniacbackend.model.OfferVote;
 
@@ -25,6 +27,7 @@ public class OfferDTO {
     private BigDecimal offeredPrice;
     private LocalTime offerTime;
     private String notes;
+    private MatchDTO match;
     private Offer.OfferStatus status;
     private Set<OfferVoteDTO> votes;
 }

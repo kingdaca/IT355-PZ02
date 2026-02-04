@@ -30,6 +30,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        if(shouldNotFilter(request)){
+            return;
+        }
+
         try {
             final String authHeader = request.getHeader("Authorization");
 
@@ -72,5 +76,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             logger.error("JWT error: {}");
             filterChain.doFilter(request, response);
         }
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/auth/");
     }
 }

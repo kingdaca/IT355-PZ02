@@ -32,7 +32,8 @@ const NavBar = () => {
                         <a href="/" className="nav-link">Home</a>
                         <a href="/matches" className="nav-link">Matches</a>
                         <a href="/courts" className="nav-link">Courts</a>
-                        {role !== 'PLAYER' && (<a href="/sendOffer" className="nav-link">Send Offer</a>)}
+                        {role !== 'PLAYER' && (<a href="/sendOffer" className="nav-link">Send offer</a>)}
+                        {role !== 'PLAYER' && (<a href="/MyOffers" className="nav-link">My offers</a>)}
                         {role === 'ADMIN' && (<a href="/registrationAsCourt" className="nav-link">Register new court</a>)}
                         <button
                             className="nav-link"

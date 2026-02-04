@@ -3,6 +3,7 @@ package org.example.padelmaniacbackend.service.impl;
 import jakarta.transaction.Transactional;
 import org.example.padelmaniacbackend.DTOs.Court.CourtDTO;
 import org.example.padelmaniacbackend.DTOs.registration.CourtOwnerRegistrationDTO;
+import org.example.padelmaniacbackend.exeption.BusinessException;
 import org.example.padelmaniacbackend.model.Court;
 import org.example.padelmaniacbackend.model.Player;
 import org.example.padelmaniacbackend.model.Role;
@@ -55,6 +56,16 @@ public class CourtServiceImpl implements CourtService {
         courtDTO.setPhone(court.getPhone());
         return courtDTO;
     }
+
+    public CourtDTO getCourtInfoByPlayerId(Long playerId){
+        Player p = playerRepository.findById(playerId);
+        CourtDTO courtDTO = convertToDTO(p.getCourt());
+        if(courtDTO != null){
+            throw new BusinessException("This player is not court owner");
+        }
+        return courtDTO;
+    }
+
 
     @Override
     @Transactional

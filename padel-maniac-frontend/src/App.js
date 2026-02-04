@@ -13,6 +13,7 @@ import {jwtDecode} from "jwt-decode";
 import {useEffect} from "react";
 import NavBar from "./components/NavBar";
 import CourtRegistrationForm from "./components/auth/CourtRegistrationForm";
+import MyOffers from "./components/MyOffers/MyOffers";
 
 function App() {
   const navigate = useNavigate();
@@ -46,6 +47,7 @@ function App() {
           <Route path="/matches" element={<Matches />} />
         <Route path="/match/:matchId" element={<MatchDetails />} />
         <Route path="/courts" element={<Courts />} />
+        <Route path="/MyOffers" element={<MyOffers />} />
         <Route path="/sendOffer" element={<SendOffer />} />
       </Routes>
     </div>

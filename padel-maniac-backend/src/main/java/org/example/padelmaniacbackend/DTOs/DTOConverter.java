@@ -1,95 +1,81 @@
-package org.example.padelmaniacbackend.service.impl;
+package org.example.padelmaniacbackend.DTOs;
 
-import jakarta.transaction.Transactional;
 import org.example.padelmaniacbackend.DTOs.Court.CourtDTO;
-import org.example.padelmaniacbackend.DTOs.matchDTO.CreateMatchDTO;
+import org.example.padelmaniacbackend.DTOs.OfferDTO.OfferDTO;
+import org.example.padelmaniacbackend.DTOs.OfferVoteDTO.OfferVoteDTO;
 import org.example.padelmaniacbackend.DTOs.matchDTO.MatchDTO;
 import org.example.padelmaniacbackend.DTOs.playerDTO.PlayerDTO;
 import org.example.padelmaniacbackend.model.Match;
+import org.example.padelmaniacbackend.model.Offer;
+import org.example.padelmaniacbackend.model.OfferVote;
 import org.example.padelmaniacbackend.model.Player;
-import org.example.padelmaniacbackend.repository.CityRepository;
+import org.example.padelmaniacbackend.repository.CourtRepository;
 import org.example.padelmaniacbackend.repository.MatchRepository;
+import org.example.padelmaniacbackend.repository.OfferRepository;
 import org.example.padelmaniacbackend.repository.PlayerRepository;
-import org.example.padelmaniacbackend.service.MatchService;
+import org.example.padelmaniacbackend.service.CourtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
-public class MatchServiceImpl implements MatchService {
+public class DTOConverter {
 
     @Autowired
-    private PlayerRepository playerRepository;
+    private OfferRepository offerRepository;
+
+    @Autowired
+    private CourtRepository courtRepository;
 
     @Autowired
     private MatchRepository matchRepository;
 
     @Autowired
-    private CityRepository cityRepository;
+    private PlayerRepository playerRepository;
 
-    @Override
-    public void createNewMatch(CreateMatchDTO createMatchDTO, String username) {
-        Match m = new Match();
-        Player p = playerRepository.findByUsername(username);
-        m.setMatchDay(createMatchDTO.getDate());
-        m.setLocation(cityRepository.findByName(createMatchDTO.getCity()));
-        m.setNotes(createMatchDTO.getNotes());
-        m.setFreePosition(createMatchDTO.getNumberOfPlayers());
-        m.setMatchAroundTime(createMatchDTO.getMatchAroundTime());
-        m.setMatchStatus(Match.MatchStatus.OPEN);
-        m.setMatchOrganizer(p);
-        m.setMatchDuration(createMatchDTO.getMatchDuration());
-        matchRepository.save(m);
+    @Autowired
+    private CourtService courtService;
+
+    public OfferDTO convertToDTO(Offer offer){
+        OfferDTO dto = new OfferDTO();
+        dto.setCourt(courtService.convertToDTO((offer.getCourt())));
+        dto.setOfferedPrice(offer.getOfferedPrice());
+        dto.setOfferTime(offer.getOfferTime());
+        dto.setNotes(offer.getNotes());
+        dto.setId(offer.getId());
+        dto.setStatus(offer.getStatus());
+        dto.setVotes(offer.getVotes().stream().map(this::convertOffeVoterDTO).collect(Collectors.toSet()));
+        return dto;
     }
 
-
-    @Override
-    public List<MatchDTO> getMatches(){
-        return findAllMatches();
+    public OfferVoteDTO convertOffeVoterDTO(OfferVote offerVote){
+        OfferVoteDTO offerVoteDTO = new OfferVoteDTO();
+        offerVoteDTO.setPlayer(covnertToPLayerDTO(offerVote.getPlayer()));
+        return offerVoteDTO;
     }
 
-    @Override
-    public MatchDTO joinToMatch(Long matchId, String username) {
-        Player p = playerRepository.findByUsername(username);
-        Match m = matchRepository.findById(matchId);
+    public PlayerDTO covnertToPLayerDTO(Player p) {
+        PlayerDTO dto = new PlayerDTO();
+        dto.setId(p.getId());
+        dto.setUsername(p.getUsername());
+        dto.setEmail(p.getEmail());
+        dto.setFirstName(p.getFirstName());
+        dto.setLastName(p.getLastName());
+        dto.setPhone(p.getPhone());
+        dto.setLevel(p.getLevel());
 
-        m.getPlayers().add(p);
-
-        m.setFreePosition(m.getFreePosition() -1);
-
-        if(m.getFreePosition() == 0){
-            m.setMatchStatus(Match.MatchStatus.FULL);
-        }
-
-        matchRepository.save(m);
-
-        return convertToDTO(m);
+        return dto;
     }
 
-    public MatchDTO matchDetails(Long matchId){
-        return convertToDTO(matchRepository.findById(matchId));
+    public OfferVoteDTO convertToOfferVoteDTO(OfferVote offerVote){
+        PlayerDTO playerDTO = covnertToPLayerDTO(offerVote.getPlayer());
+        OfferDTO offerDTO = convertToDTO(offerVote.getOffer());
+        return new OfferVoteDTO(offerDTO,playerDTO);
     }
 
-    public MatchDTO removeMatch(Long matchId){
-        Match m = matchRepository.findById(matchId);
-        m.getPlayers().clear();
-        matchRepository.save(m);
-        matchRepository.delete(m);
-        return convertToDTO(m);
-    }
-
-
-    public List<MatchDTO> findAllMatches() {
-        return matchRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    private MatchDTO convertToDTO(Match match) {
+    public MatchDTO convertToMatchDTO(Match match) {
         MatchDTO dto = new MatchDTO();
         dto.setId(match.getId());
         dto.setFreePosition(match.getFreePosition());
@@ -140,13 +126,4 @@ public class MatchServiceImpl implements MatchService {
 
         return dto;
     }
-
-    public List<MatchDTO> getUpcomingMatches(){
-        LocalDate lt
-                = LocalDate.now();
-        List<Match> matches = matchRepository.findUpcomingMatches(lt);
-        List<MatchDTO> matchDTOS = matches.stream().map(this::convertToDTO).collect(Collectors.toList());
-    return matchDTOS;
-    }
-
 }

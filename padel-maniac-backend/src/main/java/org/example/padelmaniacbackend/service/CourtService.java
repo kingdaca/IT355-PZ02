@@ -13,4 +13,6 @@ public interface CourtService {
     public CourtDTO convertToDTO(Court court);
 
     public Boolean registerCourt(CourtOwnerRegistrationDTO courtOwnerRegistrationDTO);
+
+    public CourtDTO getCourtInfoByPlayerId(Long playerId);
 }

@@ -1,4 +1,4 @@
-package org.example.padelmaniacbackend.DTOs.auth;
+package org.example.padelmaniacbackend.DTOs.OfferDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +9,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class LoginReponseDTO {
+public class GetOffersForCourtDTO {
 
-    private String token;
-    
+    private Long playerId;
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -38,10 +39,10 @@ public class Match {
 
     private LocalDate matchDay;
     private LocalTime matchAroundTime;
-    private LocalTime matchConfirmedTime;
+    private LocalTime matchScheduledTime;
     private float matchDuration;
 
-    private double price;
+    private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
     private MatchStatus matchStatus;
@@ -64,7 +65,7 @@ public class Match {
     private Court court;
 
     public enum MatchStatus {
-        OPEN, CANCELED, FULL, ONGOING , ENDED
+        OPEN, CANCELED, FULL, ONGOING , ENDED, SCHEDULED
     }
 }
 

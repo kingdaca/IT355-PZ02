@@ -1,5 +1,7 @@
 package org.example.padelmaniacbackend.controller;
 
+import lombok.extern.java.Log;
+import org.example.padelmaniacbackend.DTOs.Court.CourtDTO;
 import org.example.padelmaniacbackend.DTOs.registration.CourtOwnerRegistrationDTO;
 import org.example.padelmaniacbackend.service.CourtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,12 @@ public class CourtController {
     public ResponseEntity<?> getAllCities(){
         return ResponseEntity.ok(courtService.getAllCourts());
     }
+
+    @PostMapping("/getMyCourtInfo")
+    public ResponseEntity<?> getMyCourtInfo(@RequestBody Long playerId){
+        return ResponseEntity.ok(ApiResponse.success(courtService.getCourtInfoByPlayerId(playerId)));
+    }
+
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/registration")

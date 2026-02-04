@@ -674,3 +674,215 @@
     text-align: center;
     width: 100%;
 }
+
+/* Voting buttons styles */
+.vote-status {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+}
+
+.voted-badge {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    text-align: center;
+}
+
+.vote-options {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-change-vote {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 2px solid #fbbf24;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.btn-change-vote:hover {
+    background-color: #fde68a;
+    transform: translateY(-2px);
+}
+
+.btn-vote {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.btn-vote:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+}
+
+/* User vote status in header */
+.user-vote-status {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f8fafc;
+    border-radius: 6px;
+    border-left: 4px solid #10b981;
+}
+
+.user-vote-status .voted-status {
+    color: #065f46;
+    font-weight: 600;
+}
+
+.user-vote-status .not-voted-status {
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+/* Offer actions section */
+.offer-actions {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.info-message {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-style: italic;
+}
+
+/* Voting buttons styles */
+.vote-status {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+}
+
+.voted-badge {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    text-align: center;
+}
+
+.vote-options {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-change-vote {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 2px solid #fbbf24;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.btn-change-vote:hover {
+    background-color: #fde68a;
+    transform: translateY(-2px);
+}
+
+.btn-vote {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.btn-vote:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+}
+
+/* User vote status in header */
+.user-vote-status {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f8fafc;
+    border-radius: 6px;
+    border-left: 4px solid #10b981;
+}
+
+.user-vote-status .voted-status {
+    color: #065f46;
+    font-weight: 600;
+}
+
+.user-vote-status .not-voted-status {
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+/* Offer actions section */
+.offer-actions {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.info-message {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-style: italic;
+}

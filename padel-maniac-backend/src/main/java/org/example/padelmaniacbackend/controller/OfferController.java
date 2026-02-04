@@ -1,7 +1,11 @@
 package org.example.padelmaniacbackend.controller;
 
+import org.example.padelmaniacbackend.DTOs.OfferDTO.CanceorAcceptlOfferDTO;
 import org.example.padelmaniacbackend.DTOs.OfferDTO.CreatOfferDTO;
+import org.example.padelmaniacbackend.DTOs.OfferDTO.GetOffersForCourtDTO;
 import org.example.padelmaniacbackend.DTOs.OfferVoteDTO.OfferVoteRequestDTO;
+import org.example.padelmaniacbackend.model.Player;
+import org.example.padelmaniacbackend.service.AuthService;
 import org.example.padelmaniacbackend.service.OfferService;
 import org.example.padelmaniacbackend.service.OfferVoteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,30 +28,44 @@ public class OfferController {
 
     @PostMapping("/creatOffer")
     public ResponseEntity<?> createOffer(@RequestBody CreatOfferDTO creatOfferDTO){
-        try {
             offerService.createOffer(creatOfferDTO);
-            return ResponseEntity.ok("ok");
-        }catch (Exception exception){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
-        }
+            return ResponseEntity.ok(ApiResponse.success("ok"));
     };
 
     @PostMapping("/getOffersByMatchId")
     public ResponseEntity<?> getOffersByMatchId(@RequestBody Long matchId){
-        try {
-            return ResponseEntity.ok(offerService.findByMatchId(matchId));
-        }catch (Exception exception){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
-        }
+        return ResponseEntity.ok(ApiResponse.success(offerService.findByMatchId(matchId)));
     };
 
     @PostMapping("/vote")
     public ResponseEntity<?> vote(@RequestBody OfferVoteRequestDTO offerVoteRequestDTO){
-        try {
-            offerVoteService.vote(offerVoteRequestDTO);
-            return ResponseEntity.ok("Success");
-        }catch (Exception exception){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error");
-        }
+        offerVoteService.vote(offerVoteRequestDTO);
+        return ResponseEntity.ok(
+                ApiResponse.success("Uspešno ste glasali")
+        );
     };
+
+    @PostMapping("/getOffersForCourt")
+    public ResponseEntity<?> getOffersForCourt(@RequestBody GetOffersForCourtDTO getOffersForCourtDTO) throws Throwable {
+        return ResponseEntity.ok(
+                ApiResponse.success(offerService.findByCourtId(getOffersForCourtDTO.getPlayerId()))
+        );
+    };
+
+    @PostMapping("/cancelOffer")
+    public ResponseEntity<?> cancelOffer(@RequestBody CanceorAcceptlOfferDTO cancelOfferDTO){
+        return ResponseEntity.ok(
+                ApiResponse.success(offerService.cancelOffer(cancelOfferDTO.getOfferId()))
+        );
+    };
+
+    @PostMapping("/confirmOffer")
+    public ResponseEntity<?> confirmOffer(@RequestBody CanceorAcceptlOfferDTO cancelOfferDTO){
+        System.out.println(cancelOfferDTO.getOfferId());
+        return ResponseEntity.ok(
+                ApiResponse.success(offerService.confirmOffer(cancelOfferDTO.getOfferId()))
+        );
+    };
+
+
 }
