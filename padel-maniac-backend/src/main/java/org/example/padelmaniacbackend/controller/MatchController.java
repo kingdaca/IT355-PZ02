@@ -7,9 +7,13 @@ import org.example.padelmaniacbackend.DTOs.matchDTO.UpcomingMatchRequestDTO;
 import org.example.padelmaniacbackend.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/match")
@@ -19,6 +23,7 @@ public class MatchController {
     private MatchService matchService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasAnyRole('PLAYERS')")
     public ResponseEntity<?> createMatch(@RequestBody CreateMatchDTO createMatchDTO){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
@@ -27,12 +32,19 @@ public class MatchController {
         return ResponseEntity.ok(ApiResponse.success("ok"));
     }
 
-    @GetMapping("/getMatches")
-    public ResponseEntity<?> getAllMatches(){
-        return ResponseEntity.ok(ApiResponse.success(matchService.getMatches()));
+    @GetMapping("/getMatches/{localDate}")
+    public ResponseEntity<?> getAllMatches(@PathVariable LocalDate localDate){
+        return ResponseEntity.ok(ApiResponse.success(matchService.getMatches(localDate)));
+    }
+
+
+    @GetMapping("/getMyMatches/{userId}")
+    public ResponseEntity<?> getMyMatches(@PathVariable Long userId){
+        return ResponseEntity.ok(ApiResponse.success(matchService.getMyMatches(userId)));
     }
 
     @PostMapping("/joinToMatch")
+    @PreAuthorize("hasAnyRole('PLAYERS')")
     public ResponseEntity<?> joinToMatch(@RequestBody MatchUnsubscribeOrJoinDTO matchUnsubscribeOrJoinDTO){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName(); // 👈 USERNAME
@@ -41,12 +53,14 @@ public class MatchController {
     }
 
     @PostMapping("/requestForMatch")
+    @PreAuthorize("hasAnyRole('PLAYERS')")
     public ResponseEntity<?> requestForMatch(@RequestBody MatchUnsubscribeOrJoinDTO matchUnsubscribeOrJoinDTO){
 
         return ResponseEntity.ok(ApiResponse.success(matchService.requestForMatch(matchUnsubscribeOrJoinDTO)));
     }
 
     @PostMapping("/rejectRequest")
+    @PreAuthorize("hasAnyRole('PLAYERS')")
     public ResponseEntity<?> rejectRequest(@RequestBody MatchUnsubscribeOrJoinDTO matchUnsubscribeOrJoinDTO){
 
         return ResponseEntity.ok(ApiResponse.success(matchService.rejectRequest(matchUnsubscribeOrJoinDTO)));
@@ -58,16 +72,20 @@ public class MatchController {
     }
 
     @PostMapping("/removeMatch")
+    @PreAuthorize("hasAnyRole('PLAYERS')")
     public ResponseEntity<?> removeMatch(@RequestBody MatchIdDTO matchIdDTO){
         return ResponseEntity.ok(ApiResponse.success(matchService.removeMatch(matchIdDTO.getMatchId())));
     }
 
     @PostMapping("/matchUnsubscribe")
+    @PreAuthorize("hasAnyRole('PLAYERS')")
     public ResponseEntity<?> matchUnsubscribe(@RequestBody MatchUnsubscribeOrJoinDTO matchUnsubscribeOrJoinDTO){
         return ResponseEntity.ok(ApiResponse.success(matchService.matchUnsubscribe(matchUnsubscribeOrJoinDTO)));
     }
 
+
     @PostMapping("/getUpcomingMatches")
+    @PreAuthorize("hasAnyRole('COURT_OWNER')")
     public ResponseEntity<?> getUpcomingMatches(@RequestBody UpcomingMatchRequestDTO upcomingMatchRequestDTO){
         return ResponseEntity.ok(ApiResponse.success(matchService.getUpcomingMatches(upcomingMatchRequestDTO.getPlayerId())));
     }

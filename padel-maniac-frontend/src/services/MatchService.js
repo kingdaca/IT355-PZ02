@@ -7,8 +7,12 @@ export default {
         return api.post("/match/create", formData)
     },
 
-    async getMatches(){
-        return api.get("/match/getMatches")
+    async getMatches(date){
+        return api.get("/match/getMatches/"+date);
+    },
+
+    async getMyMatches(userId){
+        return api.get("/match/getMyMatches/"+userId);
     },
 
     async joinToMatch(matchId, playerId){

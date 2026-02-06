@@ -1,16 +1,20 @@
 package org.example.padelmaniacbackend.service;
 
+import lombok.extern.java.Log;
 import org.example.padelmaniacbackend.DTOs.matchDTO.CreateMatchDTO;
 import org.example.padelmaniacbackend.DTOs.matchDTO.MatchDTO;
 import org.example.padelmaniacbackend.DTOs.matchDTO.MatchUnsubscribeOrJoinDTO;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface MatchService {
 
     public void createNewMatch(CreateMatchDTO createMatchDTO, String username);
 
-    public List<MatchDTO> getMatches();
+    public  List<MatchDTO> getMyMatches(Long userId);
+
+    public List<MatchDTO> getMatches(LocalDate localDate);
 
     public MatchDTO joinToMatch(MatchUnsubscribeOrJoinDTO matchUnsubscribeOrJoinDTO);
 

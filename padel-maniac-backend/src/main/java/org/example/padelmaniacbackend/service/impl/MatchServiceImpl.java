@@ -70,10 +70,17 @@ public class MatchServiceImpl implements MatchService {
         matchRepository.save(m);
     }
 
+    @Override
+    public List<MatchDTO> getMyMatches(Long userId) {
+        List<Match> matches = matchRepository.findMatchByUserId(userId);
+        System.out.println(matches);
+        return matches.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
 
     @Override
-    public List<MatchDTO> getMatches(){
-        return findAllMatches();
+    public List<MatchDTO> getMatches(LocalDate localDate){
+        return findAllMatches(localDate);
     }
 
     @Override
@@ -123,7 +130,11 @@ public class MatchServiceImpl implements MatchService {
                 notificationService.sendNotification(player,message);
             }
 
-            notificationService.sendToNearbyCourts(m.getLocation());
+            if(m.isNeedReservation()){
+                m.setMatchStatus(Match.MatchStatus.SCHEDULED);
+            }else{
+                notificationService.sendToNearbyCourts(m.getLocation());
+            }
         }
 
         matchRepository.save(m);
@@ -199,12 +210,19 @@ public class MatchServiceImpl implements MatchService {
         m.getPlayers().clear();
         matchRepository.save(m);
         matchRepository.delete(m);
+
+        String message = "Your is cancel by owner " +m.getMatchDay() + " " +m.getMatchAroundTime() ;
+
+        m.getPotentialPlayers().clear();
+
+        notificationService.sendNotification(m.getMatchOrganizer(),message);
+
         return convertToDTO(m);
     }
 
 
-    public List<MatchDTO> findAllMatches() {
-        return matchRepository.findAll().stream()
+    public List<MatchDTO> findAllMatches(LocalDate localDate) {
+        return matchRepository.findByMatchDay(localDate).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

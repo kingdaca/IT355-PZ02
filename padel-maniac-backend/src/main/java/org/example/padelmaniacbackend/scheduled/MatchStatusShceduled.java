@@ -35,8 +35,10 @@ public class MatchStatusShceduled {
         matches.forEach(match -> {
 
             LocalDateTime now = LocalDateTime.now();
-            LocalDateTime matchDateTime =
-                    LocalDateTime.of(match.getMatchDay(), match.getMatchAroundTime());
+            LocalDateTime matchDateTime = LocalDateTime.of(
+                    match.getMatchDay(),
+                    match.getMatchScheduledTime() != null ? match.getMatchScheduledTime() : match.getMatchAroundTime()
+            );
 
             if (match.getMatchStatus() == Match.MatchStatus.OPEN
                     || match.getMatchStatus() == Match.MatchStatus.FULL) {

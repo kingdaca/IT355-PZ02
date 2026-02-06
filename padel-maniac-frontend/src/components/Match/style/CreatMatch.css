@@ -170,3 +170,16 @@ label[for*="date"]::after {
         font-size: 14px;
     }
 }
+
+.modal-footer-match-creat{
+display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 25px 30px;
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    .back-button{
+        margin: 0px;
+    }
+
+}
+

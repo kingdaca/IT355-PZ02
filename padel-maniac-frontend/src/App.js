@@ -14,6 +14,7 @@ import {useEffect} from "react";
 import NavBar from "./components/NavBar";
 import CourtRegistrationForm from "./components/auth/CourtRegistrationForm";
 import MyOffers from "./components/MyOffers/MyOffers";
+import MyMatches from "./components/MyMatch/MyMatches";
 
 function App() {
   const navigate = useNavigate();
@@ -47,8 +48,9 @@ function App() {
           <Route path="/matches" element={<Matches />} />
         <Route path="/match/:matchId" element={<MatchDetails />} />
         <Route path="/courts" element={<Courts />} />
-        <Route path="/MyOffers" element={<MyOffers />} />
-        <Route path="/sendOffer" element={<SendOffer />} />
+        <Route path="/my-offers" element={<MyOffers />} />
+        <Route path="/my-matches" element={<MyMatches />} />
+        <Route path="/send-offer" element={<SendOffer />} />
       </Routes>
     </div>
   );

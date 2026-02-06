@@ -43,16 +43,20 @@ const NavBar = () => {
                         <a href="/" className="nav-link">Home</a>
                         <a href="/matches" className="nav-link">Matches</a>
                         <a href="/courts" className="nav-link">Courts</a>
-                        {role !== 'PLAYER' && (<a href="/sendOffer" className="nav-link">Send offer</a>)}
-                        {role !== 'PLAYER' && (<a href="/MyOffers" className="nav-link">My offers</a>)}
-                        {role === 'ADMIN' && (<a href="/registrationAsCourt" className="nav-link">Register new court</a>)}
-                        <button
-                            className="nav-link"
-                            onClick={goToCreatMatch}
-                            title="Create Match"
-                        >
-                            🎾 Create Match
-                        </button>
+                        {role === 'PLAYER_OWNER' && (<a href="/send-offer" className="nav-link">Send offer</a>)}
+                        {role === 'PLAYER_OWNER' && (<a href="/my-offers" className="nav-link">My offers</a>)}
+                        {role !== 'ADMIN' && (<a href="/my-matche" className="nav-link">My matches</a>)}
+                        {role === 'ADMIN' && (
+                            <a href="/registrationAsCourt" className="nav-link">Register new court</a>)}
+                        {role === 'PLAYER' && (
+                            <button
+                                className="nav-link"
+                                onClick={goToCreatMatch}
+                                title="Create Match"
+                            >
+                                🎾 Create Match
+                            </button>
+                        )}
                     </div>
                 </div>
 

@@ -127,17 +127,19 @@ const CreateMatch = () => {
                         });
                         setErrors(backendErrors);
                     } else if (errorData.message) {
-                        setErrors({general: errorData.message});
+                        setErrors({ general: errorData.message });
                     }
+                } else if (error.response.status === 403) {
+                    setErrors({ general: 'You dont have permition' });
                 } else if (error.response.status === 409) {
-                    setErrors({general: 'A match with similar details already exists.'});
+                    setErrors({ general: 'A match with similar details already exists.' });
                 } else {
-                    setErrors({general: 'Failed to create match. Please try again.'});
+                    setErrors({ general: 'Failed to create match. Please try again.' });
                 }
             } else if (error.request) {
-                setErrors({general: 'Network error. Please check your connection.'});
+                setErrors({ general: 'Network error. Please check your connection.' });
             } else {
-                setErrors({general: 'An unexpected error occurred.'});
+                setErrors({ general: 'An unexpected error occurred.' });
             }
         } finally {
             setIsSubmitting(false);
@@ -301,7 +303,13 @@ const CreateMatch = () => {
                     </form>
                 </div>
 
-                <div className="modal-footer">
+                <div className="modal-footer-match-creat">
+                    <button
+                        className="back-button"
+                        onClick={() => navigate('/matches')}
+                    >
+                        ← Back to Matches
+                    </button>
                     <button
                         className="btn-create"
                         onClick={onCreateMatch}
