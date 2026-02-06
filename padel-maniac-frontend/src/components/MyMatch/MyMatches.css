@@ -1,0 +1,347 @@
+/* style/MyMatches.css */
+.my-matches-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e0e0e0;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-header h1 {
+    margin: 0;
+    color: #333;
+    font-size: 1.8rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.filter-select {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 0.9rem;
+    min-width: 150px;
+}
+
+.btn-refresh {
+    padding: 0.5rem 1rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.btn-refresh:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+.btn-refresh:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border-left: 4px solid #c62828;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #666;
+}
+
+.loading-container .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.no-matches {
+    text-align: center;
+    padding: 3rem;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    color: #666;
+}
+
+.btn-clear-filter {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-clear-filter:hover {
+    background-color: #5a6268;
+}
+
+.matches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.match-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+}
+
+.match-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.match-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.match-date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.date-icon {
+    font-size: 1.2rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge-pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.badge-confirmed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.badge-cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.badge-completed {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.match-card-body {
+    flex: 1;
+    margin-bottom: 1rem;
+}
+
+.match-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed #f0f0f0;
+}
+
+.match-detail.full-width {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #666;
+    min-width: 100px;
+}
+
+.detail-value {
+    color: #333;
+    text-align: right;
+    flex: 1;
+}
+
+.detail-value.reserved {
+    color: #28a745;
+}
+
+.detail-value.need-offer {
+    color: #ffc107;
+}
+
+.notes-content {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    color: #555;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+.players-list {
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+.player-item {
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.you-badge {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.match-card-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.court-owner-actions,
+.user-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 100px;
+}
+
+.btn-confirm {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-confirm:hover {
+    background-color: #218838;
+}
+
+.btn-cancel {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #c82333;
+}
+
+.btn-complete {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.btn-complete:hover {
+    background-color: #138496;
+}
+
+.btn-delete {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #5a6268;
+}
+
+@media (max-width: 768px) {
+    .my-matches-container {
+        padding: 1rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .header-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    .matches-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .match-card {
+        padding: 1rem;
+    }
+
+    .btn-action {
+        min-width: 80px;
+        padding: 0.5rem;
+    }
+}
