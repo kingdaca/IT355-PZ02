@@ -3,13 +3,13 @@ import "./style/CreatMatch.css"
 import CitiesService from "../../services/CitiesService";
 import MatchService from "../../services/MatchService";
 import {useNavigate} from "react-router-dom";
-import matchers from "@testing-library/jest-dom/matchers";
 
 const CreateMatch = () => {
     const [cities, setCities] = useState([]);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
+
     useEffect(() => {
         CitiesService.getAllCities()
             .then(response => {
@@ -26,6 +26,7 @@ const CreateMatch = () => {
         numberOfPlayers: '',
         date: '',
         matchDuration: '',
+        needReservation: '',
         matchAroundTime: '',
         notes: '',
     });
@@ -36,7 +37,6 @@ const CreateMatch = () => {
             ...formData,
             [name]: value
         });
-        // Clear error for this field when user starts typing
         if (errors[name]) {
             setErrors({
                 ...errors,
@@ -68,13 +68,20 @@ const CreateMatch = () => {
             newErrors.city = 'City is required';
         }
 
+        if (formData.needReservation === 'true' && !formData.notes.trim()) {
+            newErrors.notes = 'Notes are required when you have a reservation';
+        }
+
+        if (!formData.needReservation) {
+            newErrors.needReservation = 'Please select an option for reservation';
+        }
+
         return newErrors;
     };
 
     const onCreateMatch = async (e) => {
         e?.preventDefault();
 
-        // Validate form
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
@@ -84,37 +91,34 @@ const CreateMatch = () => {
         formData.matchAroundTime = formData.date.slice(-5);
 
         setIsSubmitting(true);
-        setErrors({}); // Clear previous errors
+        setErrors({});
 
         try {
             const response = await MatchService.createMatch(formData);
             console.log("Match created successfully:", response);
 
-            // Show success message
             setErrors({general: 'success'});
 
-            // Reset form on success
             setFormData({
                 city: '',
                 numberOfPlayers: '',
+                needReservation: '',
                 date: '',
                 notes: '',
                 matchDuration: '',
             });
 
-            setTimeout(()=>{
+            setTimeout(() => {
                 navigate("/")
-            })
+            }, 2000);
 
         } catch (error) {
             console.error("Error creating match:", error);
 
             if (error.response) {
-                // Handle backend validation errors
                 if (error.response.status === 400) {
                     const errorData = error.response.data.data;
                     if (errorData.errors) {
-                        // Map backend errors to form fields
                         const backendErrors = {};
                         errorData.errors.forEach(err => {
                             if (err.field) {
@@ -137,11 +141,9 @@ const CreateMatch = () => {
             }
         } finally {
             setIsSubmitting(false);
-
         }
     };
 
-    // Handle form submission on Enter key
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
             onCreateMatch();
@@ -156,14 +158,12 @@ const CreateMatch = () => {
                 </div>
 
                 <div className="modal-content">
-                    {/* Success Message */}
                     {errors.general === 'success' && (
                         <div className="success-message">
                             ✅ Match created successfully!
                         </div>
                     )}
 
-                    {/* Error Message */}
                     {errors.general && errors.general !== 'success' && (
                         <div className="error-message">
                             ❌ {errors.general}
@@ -172,7 +172,25 @@ const CreateMatch = () => {
 
                     <form onSubmit={onCreateMatch} className="match-form">
                         <div className="form-group">
-                            <label>How many players are you looking for? *</label>
+                            <label>Do you have a reservation? *</label>
+                            <select
+                                className={`form-control ${errors.needReservation ? 'error' : ''}`}
+                                name="needReservation"
+                                value={formData.needReservation}
+                                onChange={handleChange}
+                            >
+                                <option value="">Select an option</option>
+                                <option value="true">I have a reservation</option>
+                                <option value="false">I want the court to send an offer</option>
+                            </select>
+
+                            {errors.needReservation && (
+                                <span className="error-text">{errors.needReservation}</span>
+                            )}
+                        </div>
+
+                        <div className="form-group">
+                            <label>Number of Players *</label>
                             <select
                                 className={`form-control ${errors.numberOfPlayers ? 'error' : ''}`}
                                 name="numberOfPlayers"
@@ -184,6 +202,7 @@ const CreateMatch = () => {
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
+                                <option value="4">4</option>
                             </select>
                             {errors.numberOfPlayers && (
                                 <span className="error-text">{errors.numberOfPlayers}</span>
@@ -232,7 +251,6 @@ const CreateMatch = () => {
                             )}
                         </div>
 
-
                         <div className="form-group">
                             <label>Location *</label>
                             <select
@@ -254,18 +272,27 @@ const CreateMatch = () => {
                             )}
                         </div>
 
-
                         <div className="form-group">
-                            <label>Notes (Optional)</label>
+                            <label>
+                                Notes
+                                {formData.needReservation === 'true' ? ' *' : ' (Optional)'}
+                            </label>
                             <textarea
                                 name="notes"
                                 value={formData.notes}
                                 onChange={handleChange}
-                                className="form-control"
+                                className={`form-control ${errors.notes ? 'error' : ''}`}
                                 rows="3"
-                                placeholder="Any special requirements or notes..."
+                                placeholder={
+                                    formData.needReservation === 'true'
+                                        ? "Please provide reservation details (court number, time, etc.)..."
+                                        : "Any special requirements or notes..."
+                                }
                                 onKeyPress={handleKeyPress}
                             />
+                            {errors.notes && (
+                                <span className="error-text">{errors.notes}</span>
+                            )}
                         </div>
 
                         <div className="form-footer" style={{display: 'none'}}>

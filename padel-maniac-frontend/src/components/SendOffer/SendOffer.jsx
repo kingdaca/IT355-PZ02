@@ -28,6 +28,7 @@ const SendOffer = () => {
     const [offerNotes, setOfferNotes] = useState('');
     const [offerTime, setOfferTime] = useState('');
     const [sendingOffer, setSendingOffer] = useState(false);
+    const userId = Number(localStorage.getItem("userId"));
     const [courtId, setCourtId] = useState(null); // Samo ID treba
 
     useEffect(() => {
@@ -45,7 +46,7 @@ const SendOffer = () => {
             setLoading(true);
 
             // Fetch upcoming matches
-            const matchesResponse = await MatchService.getUpcomingMatches();
+            const matchesResponse = await MatchService.getUpcomingMatches(userId);
 
             // Filter matches: only OPEN, future, without selected court
             const filteredMatches = matchesResponse.data.data.filter(match => {

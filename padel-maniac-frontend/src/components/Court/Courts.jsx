@@ -297,37 +297,6 @@ const Courts = () => {
                     </div>
                 )}
             </div>
-
-            {/* Partnership Info */}
-            <div className="partnership-info">
-                <h2>🏆 Become a Partner Court</h2>
-                <p>Join our network of premium padel courts and reach thousands of active players.</p>
-                <div className="benefits-grid">
-                    <div className="benefit-card">
-                        <FontAwesomeIcon icon={faUsers} size="2x" />
-                        <h4>Increased Visibility</h4>
-                        <p>Get listed to thousands of active padel players</p>
-                    </div>
-                    <div className="benefit-card">
-                        <FontAwesomeIcon icon={faCalendarCheck} size="2x" />
-                        <h4>Online Booking</h4>
-                        <p>24/7 online booking system for your courts</p>
-                    </div>
-                    <div className="benefit-card">
-                        <FontAwesomeIcon icon={faStar} size="2x" />
-                        <h4>Premium Features</h4>
-                        <p>Highlight your court with premium features</p>
-                    </div>
-                    <div className="benefit-card">
-                        <FontAwesomeIcon icon={faMoneyBillWave} size="2x" />
-                        <h4>Revenue Share</h4>
-                        <p>Earn from every booking through our platform</p>
-                    </div>
-                </div>
-                <button className="btn-partner">
-                    Become a Partner Court
-                </button>
-            </div>
         </div>
     );
 };

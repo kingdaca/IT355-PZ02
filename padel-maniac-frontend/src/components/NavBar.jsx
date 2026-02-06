@@ -21,6 +21,16 @@ const NavBar = () => {
         navigate("/CreateMatch")
     };
 
+    const logout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        localStorage.removeItem("role");
+        localStorage.removeItem("userId");
+        console.log("aaaaaa");
+        navigate("/login")
+    }
+
+
     return (
         <>
             <div className="nav-bar">
@@ -54,7 +64,10 @@ const NavBar = () => {
                     <div className="user-dropdown">
                         <span className="dropdown-arrow">▼</span>
                     </div>
-                    <Notification></Notification>
+                    <div className="notification">
+                        <Notification></Notification>
+                        <span onClick={logout}>Logout</span>
+                    </div>
                 </div>
             </div>
         </>

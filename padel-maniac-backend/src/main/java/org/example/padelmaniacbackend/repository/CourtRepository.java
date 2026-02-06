@@ -1,5 +1,6 @@
 package org.example.padelmaniacbackend.repository;
 
+import org.example.padelmaniacbackend.model.City;
 import org.example.padelmaniacbackend.model.Court;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -10,4 +11,6 @@ import java.util.List;
 public interface CourtRepository extends JpaRepository<Court, Integer> {
 
     Court findById(Long id);
+
+    List<Court> findByCity(City c);
 }

@@ -2,12 +2,20 @@ package org.example.padelmaniacbackend.service.impl;
 
 import org.example.padelmaniacbackend.DTOs.NotificatioDTO.NotificationDTO;
 import org.example.padelmaniacbackend.exeption.ResourceNotFoundException;
+import org.example.padelmaniacbackend.model.City;
+import org.example.padelmaniacbackend.model.Court;
 import org.example.padelmaniacbackend.model.Notification;
+import org.example.padelmaniacbackend.model.Player;
+import org.example.padelmaniacbackend.repository.CityRepository;
+import org.example.padelmaniacbackend.repository.CourtRepository;
 import org.example.padelmaniacbackend.repository.NotificationRepository;
 import org.example.padelmaniacbackend.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +25,15 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Autowired
     private NotificationRepository notificationRepository;
+
+    @Autowired
+    private CourtRepository courtRepository;
+
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public NotificationServiceImpl(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
 
     @Override
@@ -42,5 +59,25 @@ public class NotificationServiceImpl implements NotificationService {
         notificationDTO.setMessage(notification.getMessage());
         notificationDTO.setPlayerId(notification.getPlayer().getId());
         return notificationDTO;
+    }
+
+    @Override
+    public void sendNotification(Player p, String message){
+        Notification notification = new Notification();
+        notification.setMessage(message);
+        notification.setSentAt(LocalDateTime.now(ZoneOffset.UTC));
+        notification.setPlayer(p);
+        notificationRepository.save(notification);
+        messagingTemplate.convertAndSend("/topic/notifications/"+p.getId(),convertToNotificatioDTO(notification));
+    }
+
+    @Override
+    public void sendToNearbyCourts(City city) {
+        List<Court> courts = courtRepository.findByCity(city);
+        String message = "New match in your city, you can sent offer";
+        for (Court c : courts){
+            sendNotification(c.getPlayer(),message);
+        }
+
     }
 }

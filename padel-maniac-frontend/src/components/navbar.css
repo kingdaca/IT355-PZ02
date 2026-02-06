@@ -452,3 +452,13 @@
         gap: 10px;
     }
 }
+
+.notification{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #336699;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}

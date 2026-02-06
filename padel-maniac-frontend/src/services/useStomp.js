@@ -15,7 +15,7 @@ export function useStomp(topic) {
                 console.log('STOMP connected');
 
                 client.subscribe(topic, (message) => {
-                    setMessages((prev) => [...prev, JSON.parse(message.body)]);
+                    setMessages(JSON.parse(message.body));
                 });
             },
             onStompError: (frame) => {

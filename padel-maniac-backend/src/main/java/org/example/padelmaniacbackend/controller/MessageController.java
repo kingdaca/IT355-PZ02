@@ -21,7 +21,6 @@ public class MessageController {
 
     @MessageMapping("reed-notification")
     private void updateNotification(Long notificationId){
-        System.out.println("aaa" +  notificationId);
         notificationService.reedNotification(notificationId);
     }
 

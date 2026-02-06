@@ -97,6 +97,7 @@ public class CourtServiceImpl implements CourtService {
         c.setPhone(courtOwnerRegistrationDTO.getCourtPhone());
         c.setAddress(courtOwnerRegistrationDTO.getAddress());
         c.setCity(city);
+        c.setPlayer(p);
         courtRepository.save(c);
         p.setCourt(c);
         playerRepository.save(p);

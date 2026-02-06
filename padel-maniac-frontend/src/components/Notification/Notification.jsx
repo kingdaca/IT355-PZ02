@@ -29,8 +29,8 @@ const Notification = () => {
 
     useEffect(() => {
         if (!messages) return;
-
-        const newNotification = JSON.stringify(messages)
+        console.log("set message", messages)
+        const newNotification = messages
 
         setNotifications(prev => [newNotification, ...prev]);
     }, [messages]);

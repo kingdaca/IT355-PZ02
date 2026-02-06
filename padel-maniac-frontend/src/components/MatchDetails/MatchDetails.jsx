@@ -9,6 +9,7 @@ const MatchDetails = () => {
     const navigate = useNavigate();
     const [match, setMatch] = useState(null);
     const [offers, setOffers] = useState([]);
+    const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const userId = Number(localStorage.getItem("userId"));
@@ -41,7 +42,6 @@ const MatchDetails = () => {
             setOffers(offersData);
 
             // Svi igrači (uključujući organizatora) mogu da glasaju
-            // Proveri sve ponude da vidiš da li je trenutni korisnik glasao
             let userVoteForOfferId = null;
             let userHasVoted = false;
 
@@ -85,12 +85,13 @@ const MatchDetails = () => {
     // Funkcija za join
     const handleJoinMatch = async () => {
         try {
-            await MatchService.joinMatch(matchId);
-            alert('Successfully joined the match!');
+            await MatchService.requestForMatch(Number(matchId), userId);
+            alert('Join request sent successfully!');
             fetchMatchDetails();
         } catch (err) {
             console.error('Error joining match:', err);
-            alert(err.response?.data?.data.message || 'Failed to join match');
+            alert(err.response?.data?.message || 'Failed to send join request');
+            fetchMatchDetails();
         }
     };
 
@@ -100,13 +101,47 @@ const MatchDetails = () => {
             navigate("/matches");
         } catch (err) {
             console.error('Error remove match:', err);
-            alert(err.response?.data?.data.message || 'Failed to remove match');
+            alert(err.response?.data?.message || 'Failed to remove match');
+        }
+    };
+
+    const handleMatchUnsubscribe = async () => {
+        try {
+            await MatchService.matchUnsubscribe(Number(matchId), userId);
+            fetchMatchDetails();
+        } catch (err) {
+            console.error('Error unsubscribe match:', err);
+            alert(err.response?.data?.message || 'Failed to unsubscribe match');
+        }
+    };
+
+    // Prihvatanje zahtjeva
+    const handleAcceptRequest = async (playerId) => {
+        try {
+            await MatchService.joinToMatch(matchId,playerId);
+            alert('Request accepted successfully!');
+            // Osveži sve podatke
+            fetchMatchDetails();
+        } catch (err) {
+            console.error('Error accepting request:', err);
+            alert(err.response?.data?.message || 'Failed to accept request');
+        }
+    };
+
+    // Odbijanje zahtjeva
+    const handleRejectRequest = async (playerId) => {
+        try {
+            await MatchService.rejectRequest(matchId, playerId);
+            alert('Request rejected successfully!');
+            fetchMatchDetails();
+        } catch (err) {
+            console.error('Error rejecting request:', err);
+            alert(err.response?.data?.message || 'Failed to reject request');
         }
     };
 
     // Glasanje za ponudu
     const handleVoteForOffer = async (offerId) => {
-        // Proveri da li je korisnik učesnik meča (igrač ILI organizator)
         const isParticipant = match?.players?.some(p => p.id === userId);
         const isOrganizer = match?.matchOrganizer?.id === userId;
 
@@ -115,28 +150,24 @@ const MatchDetails = () => {
             return;
         }
 
-        // Ako je ponuda već prihvaćena ili odbijena, ne može se glasati
         const offer = offers.find(o => o.id === offerId);
         if (offer && offer.status !== 'PENDING') {
             alert(`Cannot vote for ${offer.status.toLowerCase()} offer`);
             return;
         }
 
-        // Ako je već glasao za ovu ponudu, ne radi ništa
         if (voteStats.userVoteForOffer === offerId) {
             alert("You have already voted for this offer!");
             return;
         }
 
         try {
-            // Ako je već glasao za neku drugu ponudu, pitaj da li želi da promeni glas
             if (voteStats.hasVoted && voteStats.userVoteForOffer !== offerId) {
                 setOfferToVote(offerId);
                 setShowVoteChangeModal(true);
                 return;
             }
 
-            // Ako nije glasao, direktno glasaj
             await performVote(offerId);
 
         } catch (err) {
@@ -189,7 +220,7 @@ const MatchDetails = () => {
         setOfferToVote(null);
     };
 
-    // Proveri da li je user učesnik u meču (igrač ILI organizator)
+    // Proveri da li je user učesnik u meču
     const isParticipant = match?.players?.some(p => p.id === userId);
     const isOrganizer = match?.matchOrganizer?.id === userId;
     const isMatchMember = isParticipant || isOrganizer;
@@ -302,19 +333,37 @@ const MatchDetails = () => {
                         💰 Courts Offers ({offers.length})
                     </button>
                 )}
+                {isOrganizer && (
+                    <button
+                        className={`tab-btn ${activeTab === 'requests' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('requests')}
+                    >
+                        👥 Join Requests ({match.potentialPlayers.length})
+                    </button>
+                )}
             </div>
 
-            {/* Details Tab */}
+            {/* Details Tab - NIŠTA NISAM MENJAO OVDE */}
             {activeTab === 'details' && (
                 <>
                     {/* Match Info */}
                     <div className="match-info-grid">
                         <div className="info-card">
-                            {match.matchStatus !== 'SCHEDULED' ? (
+                            {!match.needReservation ? (
                                 <>
-                                    <h3>📅 Date & Around Time</h3>
-                                    <p className="date-primary">{formatDate(match.matchDay)}</p>
-                                    <p className="date-secondary">{formatTime(match.matchAroundTime)}</p>
+                                    {match.matchStatus !== 'SCHEDULED' ? (
+                                        <>
+                                            <h3>📅 Date & Around Time</h3>
+                                            <p className="date-primary">{formatDate(match.matchDay)}</p>
+                                            <p className="date-secondary">{formatTime(match.matchAroundTime)}</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <h3>📅 Date & Scheduled Time</h3>
+                                            <p className="date-primary">{formatDate(match.matchDay)}</p>
+                                            <p className="date-secondary">{formatTime(match.matchScheduledTime)}</p>
+                                        </>
+                                    )}
                                 </>
                             ) : (
                                 <>
@@ -322,14 +371,19 @@ const MatchDetails = () => {
                                     <p className="date-primary">{formatDate(match.matchDay)}</p>
                                     <p className="date-secondary">{formatTime(match.matchScheduledTime)}</p>
                                 </>
-                            )}
-                    </div>
+                                )}
+                        </div>
 
-                    <div className="info-card">
-                        <h3>📍 Location</h3>
-                        <p>{match.location}</p>
-                        {match.court && (
-                            <div className="court-info">
+                        <div className="info-card">
+                            <h3>📍 Location</h3>
+                            <p>{match.location}</p>
+                            {match.needReservation && (
+                                <div className="court-info">
+                                    I have a reservation
+                                </div>
+                            )}
+                            {match.court && (
+                                <div className="court-info">
                                     <p><strong>Selected Court:</strong></p>
                                     <p>{match.court.courtName}</p>
                                     <p>{match.court.address}</p>
@@ -414,7 +468,7 @@ const MatchDetails = () => {
                                     className="join-button"
                                     onClick={handleJoinMatch}
                                 >
-                                    Join This Match
+                                    Send request for this match
                                 </button>
                                 <p className="join-note">
                                     Click to join this match
@@ -436,11 +490,25 @@ const MatchDetails = () => {
                                 </p>
                             </div>
                         )}
+
+                        {!isOrganizer && isParticipant && (
+                            <div className="remove-section">
+                                <button
+                                    className="remove-button"
+                                    onClick={handleMatchUnsubscribe}
+                                >
+                                    ❌ Unsubscribe Match
+                                </button>
+                                <p className="remove-note">
+                                    This action cannot be undone
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </>
             )}
 
-            {/* Offers Tab */}
+            {/* Offers Tab - NIŠTA NISAM MENJAO OVDE */}
             {activeTab === 'offers' && (
                 <div className="offers-section">
                     <div className="offers-header">
@@ -497,13 +565,11 @@ const MatchDetails = () => {
                         <div className="offers-list">
                             {offers.map(offer => {
                                 const userVoteCount = offer.votes?.length || 0;
-                                const totalPlayers = voteStats.totalPlayers; // Ukupan broj učesnika (igrači + organizator)
+                                const totalPlayers = voteStats.totalPlayers;
                                 const isWinning = winningOffer && !winningOffer.isTie &&
                                     winningOffer.offer?.id === offer.id;
                                 const isTied = winningOffer?.isTie &&
                                     winningOffer.offers.some(o => o.id === offer.id);
-
-                                // Proveri da li je trenutni korisnik glasao za ovu ponudu
                                 const hasUserVotedForThis = voteStats.userVoteForOffer === offer.id;
 
                                 return (
@@ -593,7 +659,7 @@ const MatchDetails = () => {
                                             </div>
                                         </div>
 
-                                        {/* Voting Actions - za sve učesnike meča */}
+                                        {/* Voting Actions */}
                                         <div className="offer-actions">
                                             {offer.status === 'PENDING' && isMatchMember && (
                                                 <>
@@ -649,6 +715,98 @@ const MatchDetails = () => {
                                     </div>
                                 );
                             })}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* NEW: Requests Tab - samo za organizatora */}
+            {activeTab === 'requests' && isOrganizer && (
+                <div className="requests-section">
+                    <div className="requests-header">
+                        <h2>👥 Join Requests</h2>
+                        <div className="requests-info">
+                            <p className="requests-count">{match.potentialPlayers.length} pending request{match.potentialPlayers.length !== 1 ? 's' : ''}</p>
+                            <p className="requests-instruction">
+                                👆 <strong>Review incoming requests:</strong> Accept or reject players who want to join this match.
+                                Available slots: {match.freePosition}
+                            </p>
+                        </div>
+                    </div>
+
+                    {match.potentialPlayers.length === 0 ? (
+                        <div className="no-requests">
+                            <div className="no-requests-icon">📭</div>
+                            <h3>No pending requests</h3>
+                            <p>No players have requested to join this match yet.</p>
+                        </div>
+                    ) : (
+                        <div className="requests-list">
+                            {match.potentialPlayers.map(request => (
+                                <div key={request?.id} className="request-card">
+                                    <div className="request-header">
+                                        <div className="request-player">
+                                            <div className="player-avatar">
+                                                {request?.firstName?.charAt(0)}
+                                            </div>
+                                            <div className="player-info">
+                                                <h3>{request?.firstName} {request?.lastName}</h3>
+                                                <span className={`player-level level-${request?.level?.toLowerCase()}`}>
+                                                    {request?.level}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="request-details">
+                                        <div className="detail-row">
+                                            <span className="detail-label">📧 Email:</span>
+                                            <span className="detail-value">{request?.email || 'N/A'}</span>
+                                        </div>
+                                        <div className="detail-row">
+                                            <span className="detail-label">📱 Phone:</span>
+                                            <span className="detail-value">{request?.phone || 'N/A'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="request-actions">
+                                        {match.freePosition > 0 && (
+                                            <>
+                                                <button
+                                                    className="btn-accept"
+                                                    onClick={() => handleAcceptRequest(request.id)}
+                                                >
+                                                    ✅ Accept
+                                                </button>
+                                                <button
+                                                    className="btn-reject"
+                                                    onClick={() => handleRejectRequest(request.id)}
+                                                >
+                                                    ❌ Reject
+                                                </button>
+                                            </>
+                                        )}
+
+                                        {request.status === 'PENDING' && match.freePosition === 0 && (
+                                            <div className="info-message">
+                                                ⚠️ No available slots. Free up a slot or reject this request.
+                                            </div>
+                                        )}
+
+                                        {request.status === 'ACCEPTED' && (
+                                            <div className="accepted-badge">
+                                                ✅ Accepted on {new Date(request.updatedAt).toLocaleDateString()}
+                                            </div>
+                                        )}
+
+                                        {request.status === 'REJECTED' && (
+                                            <div className="rejected-badge">
+                                                ❌ Rejected on {new Date(request.updatedAt).toLocaleDateString()}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>

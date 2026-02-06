@@ -42,6 +42,8 @@ public class Match {
     private LocalTime matchScheduledTime;
     private float matchDuration;
 
+    private boolean needReservation;
+
     private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
@@ -63,6 +65,15 @@ public class Match {
     @JoinColumn(name = "court_id")
     @JsonIgnore
     private Court court;
+
+    @OneToMany
+    @JoinTable(
+            name = "potential_players",
+            joinColumns = @JoinColumn(name = "match_id"),
+            inverseJoinColumns = @JoinColumn(name = "player_id")
+    )
+    @JsonIgnore
+    private List<Player> potentialPlayers;
 
     public enum MatchStatus {
         OPEN, CANCELED, FULL, ONGOING , ENDED, SCHEDULED

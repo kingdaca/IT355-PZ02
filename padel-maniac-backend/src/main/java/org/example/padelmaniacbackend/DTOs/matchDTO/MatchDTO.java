@@ -22,8 +22,10 @@ public class MatchDTO {
     private int freePosition;
     private String location;
     List<PlayerDTO> players;
+    List<PlayerDTO> potentialPlayers;
     private LocalDate matchDay;
     private Match.MatchStatus matchStatus;
+    private boolean needReservation;
     private float matchDuration;
     private LocalTime matchAroundTime;
     private LocalTime matchScheduledTime;

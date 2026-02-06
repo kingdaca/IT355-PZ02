@@ -17,6 +17,7 @@ public class CreateMatchDTO {
     private int numberOfPlayers;
     private LocalDate date;
     private LocalTime matchAroundTime;
+    private boolean needReservation;
     private float matchDuration;
     private String city;
     private String notes;

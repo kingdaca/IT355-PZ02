@@ -82,6 +82,7 @@ public class DTOConverter {
         dto.setMatchScheduledTime(match.getMatchScheduledTime());
         dto.setNotes(match.getNotes());
         dto.setMatchDuration(match.getMatchDuration());
+        dto.setNeedReservation(match.isNeedReservation());
 
         List<PlayerDTO> playerDTOs = match.getPlayers().stream()
                 .map(player -> {
@@ -97,6 +98,21 @@ public class DTOConverter {
                 })
                 .collect(Collectors.toList());
         dto.setPlayers(playerDTOs);
+
+        List<PlayerDTO> potentialPlayerDTOs = match.getPotentialPlayers().stream()
+                .map(player -> {
+                    PlayerDTO playerDTO = new PlayerDTO();
+                    playerDTO.setId(player.getId());
+                    playerDTO.setPhone(player.getPhone());
+                    playerDTO.setUsername(player.getUsername());
+                    playerDTO.setFirstName(player.getFirstName());
+                    playerDTO.setLastName(player.getLastName());
+                    playerDTO.setEmail(player.getEmail());
+                    playerDTO.setLevel(player.getLevel());
+                    return playerDTO;
+                })
+                .collect(Collectors.toList());
+        dto.setPotentialPlayers(potentialPlayerDTOs);
 
         PlayerDTO organizerDTO = new PlayerDTO();
         organizerDTO.setId(match.getMatchOrganizer().getId());

@@ -25,4 +25,8 @@ public class Court {
 
     @OneToMany(mappedBy = "court")
     private List<Offer> offers = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "player_id")
+    private Player player;
 }

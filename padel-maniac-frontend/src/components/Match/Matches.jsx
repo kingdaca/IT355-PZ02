@@ -100,9 +100,11 @@ const Matches = () => {
 
 
     const isUserInMatch = (matchId) => {
-       var m = matches.find(match => match.id === matchId);
+        const m = matches.find(match => match.id === matchId);
+        if (!m || !m.players) return false;
         return m.players.some(p => p.id === userId);
-    }
+    };
+
 
     const handleFilterClick = (filter) => {
         setFilters(filter);
@@ -114,7 +116,7 @@ const Matches = () => {
 
     const handleJoinMatch = async (matchId, organizerName) => {
         try {
-            const response = await MatchService.joinToMatch(matchId);
+            const response = await MatchService.requestForMatch(matchId, userId);
 
             setMatches(prev =>
                 prev.map(m =>
@@ -175,12 +177,6 @@ const Matches = () => {
                         onClick={() => handleFilterClick('all')}
                     >
                         <FontAwesomeIcon icon={faList} /> All Matches
-                    </button>
-                    <button
-                        className={`filter-btn ${filters === 'nearby' ? 'active' : ''}`}
-                        onClick={() => handleFilterClick('nearby')}
-                    >
-                        <FontAwesomeIcon icon={faMapMarkerAlt} /> Nearby
                     </button>
                     <button
                         className={`filter-btn ${filters === 'today' ? 'active' : ''}`}

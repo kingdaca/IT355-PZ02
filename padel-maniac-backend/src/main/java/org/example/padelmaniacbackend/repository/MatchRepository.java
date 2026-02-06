@@ -1,5 +1,6 @@
 package org.example.padelmaniacbackend.repository;
 
+import org.example.padelmaniacbackend.model.City;
 import org.example.padelmaniacbackend.model.Match;
 import org.example.padelmaniacbackend.model.Offer;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,7 +16,8 @@ public interface MatchRepository extends JpaRepository<Match, Integer> {
 
     Match findById(Long id);
 
-    @Query("SELECT m FROM Match m WHERE m.matchDay >= :today and m.matchStatus = 'FULL'")
-    List<Match> findUpcomingMatches(@Param("today") LocalDate today);
+    @Query("SELECT m FROM Match m WHERE m.matchDay >= :today and m.matchStatus = 'FULL' and m.location = :city")
+    List<Match> findUpcomingMatches(@Param("today") LocalDate today,@Param("city") City city);
+
 
 }

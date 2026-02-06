@@ -12,6 +12,7 @@ import org.example.padelmaniacbackend.repository.OfferRepository;
 import org.example.padelmaniacbackend.repository.CourtRepository;
 import org.example.padelmaniacbackend.repository.MatchRepository;
 import org.example.padelmaniacbackend.repository.PlayerRepository;
+import org.example.padelmaniacbackend.service.NotificationService;
 import org.example.padelmaniacbackend.service.OfferService;
 import org.example.padelmaniacbackend.service.CourtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class OfferServiceImpl implements OfferService {
 
     @Autowired
     private PlayerRepository playerRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private CourtService courtService;
@@ -66,6 +70,12 @@ public class OfferServiceImpl implements OfferService {
         offer.setStatus(Offer.OfferStatus.PENDING);
         offer.setNotes(creatOfferDTO.getNotes());
         offer.setMatch(m);
+        String message = "New offer for match in " + m.getMatchDay() + " " +  m.getMatchAroundTime();
+        notificationService.sendNotification(m.getMatchOrganizer(), message);
+        for (Player p1 : m.getPlayers()){
+            notificationService.sendNotification(p1,message);
+        }
+
         offerRepository.save(offer);
     }
 
@@ -132,6 +142,16 @@ public class OfferServiceImpl implements OfferService {
         m.setCourt(offer.getCourt());
         m.setMatchStatus(Match.MatchStatus.SCHEDULED);
         matchRepository.save(m);
+
+        String message = "The court confirmed the offer. Your match is scheduled for "
+                + m.getMatchScheduledTime();
+
+        Player organizer = m.getMatchOrganizer();
+        notificationService.sendNotification(organizer,message);
+
+        for (Player p : m.getPlayers()){
+            notificationService.sendNotification(p,message);
+        }
 
         return convertToDTO(offer);
     }

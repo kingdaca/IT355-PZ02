@@ -11,8 +11,24 @@ export default {
         return api.get("/match/getMatches")
     },
 
-    async joinToMatch(matchId){
-        return api.post("/match/joinToMatch", matchId,{
+    async joinToMatch(matchId, playerId){
+        return api.post("/match/joinToMatch",{
+            matchId : matchId,
+            playerId : playerId
+        },{
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    },
+
+    async requestForMatch(matchId,userId){
+        return api.post("/match/requestForMatch",
+            {
+                matchId : matchId,
+                playerId : userId
+            }
+            ,{
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -28,15 +44,39 @@ export default {
     },
 
     async removeMatch(matchId){
-        return api.post("/match/removeMatch", matchId,{
+        return api.post("/match/removeMatch", {matchId : matchId},{
             headers: {
                 'Content-Type': 'application/json'
             }
         });
     },
 
-    async getUpcomingMatches(){
-        return api.get("/match/getUpcomingMatches")
+    async getUpcomingMatches(playerId){
+        return api.post("/match/getUpcomingMatches",{playerId: playerId},{
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+    },
+
+    async matchUnsubscribe(matchId, playerId) {
+        return api.post(
+            "/match/matchUnsubscribe",
+            {
+                matchId: matchId,
+                playerId: playerId
+            }
+        );
+    },
+
+    async rejectRequest(matchId, playerId) {
+        return api.post(
+            "/match/rejectRequest",
+            {
+                matchId: matchId,
+                playerId: playerId
+            }
+        );
     }
 
 
